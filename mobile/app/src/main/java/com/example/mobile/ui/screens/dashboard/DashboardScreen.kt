@@ -1,4 +1,4 @@
-package com.example.mobile.ui.screens
+package com.example.mobile.ui.screens.dashboard
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

@@ -1,4 +1,4 @@
-package com.example.mobile.ui.screens
+package com.example.mobile.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -23,11 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobile.ui.components.AuthTextField
+import com.example.mobile.ui.theme.InterFontFamily
 import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncLightBackground
 import com.example.mobile.ui.theme.NSyncMutedText
@@ -53,26 +54,25 @@ fun RegisterScreen(
         Text(
             text = "NSync",
             color = NSyncBlue,
-            style = MaterialTheme.typography.bodyLarge,
-            fontSize =  35.sp,
-            fontWeight = FontWeight.Bold
+            style = RegisterLogoStyle
         )
 
         Spacer(modifier = Modifier.height(42.dp))
 
         Text(
             text = "Create Account",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(top = 10.dp, bottom = 10.dp),
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold
+            color = RegisterTitle,
+            style = RegisterTitleStyle
         )
 
         Text(
             text = "Start building your personal knowledge base.",
             modifier = Modifier.fillMaxWidth(),
             color = NSyncMutedText,
-            style = MaterialTheme.typography.bodyMedium
+            style = RegisterBodyStyle
         )
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -115,9 +115,8 @@ fun RegisterScreen(
         ) {
             Text(
                 text = "Create Account  →",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                style = RegisterButtonStyle
             )
         }
 
@@ -127,7 +126,7 @@ fun RegisterScreen(
             Text(
                 text = "Already have an account?",
                 color = NSyncMutedText,
-                style = MaterialTheme.typography.bodySmall,
+                style = RegisterSmallStyle,
                 textAlign = TextAlign.Center
             )
 
@@ -135,7 +134,7 @@ fun RegisterScreen(
                 Text(
                     text = "Login",
                     color = NSyncBlue,
-                    fontWeight = FontWeight.Bold
+                    style = RegisterLinkStyle
                 )
             }
         }
@@ -148,7 +147,57 @@ private fun RegisterLabel(text: String) {
         text = text,
         modifier = Modifier.fillMaxWidth(),
         color = NSyncMutedText,
-        style = MaterialTheme.typography.labelMedium,
-        fontWeight = FontWeight.SemiBold
+        style = RegisterLabelStyle
     )
 }
+
+private val RegisterTitle = Color(0xFF151927)
+
+private val RegisterLogoStyle = TextStyle(
+    fontFamily = InterFontFamily,
+    fontSize = 35.sp,
+    lineHeight = 42.sp,
+    fontWeight = FontWeight.ExtraBold
+)
+
+private val RegisterTitleStyle = TextStyle(
+    fontFamily = InterFontFamily,
+    fontSize = 32.sp,
+    lineHeight = 38.sp,
+    fontWeight = FontWeight.ExtraBold
+)
+
+private val RegisterBodyStyle = TextStyle(
+    fontFamily = InterFontFamily,
+    fontSize = 14.sp,
+    lineHeight = 20.sp,
+    fontWeight = FontWeight.Normal
+)
+
+private val RegisterLabelStyle = TextStyle(
+    fontFamily = InterFontFamily,
+    fontSize = 13.sp,
+    lineHeight = 18.sp,
+    fontWeight = FontWeight.SemiBold
+)
+
+private val RegisterButtonStyle = TextStyle(
+    fontFamily = InterFontFamily,
+    fontSize = 16.sp,
+    lineHeight = 20.sp,
+    fontWeight = FontWeight.Bold
+)
+
+private val RegisterSmallStyle = TextStyle(
+    fontFamily = InterFontFamily,
+    fontSize = 13.sp,
+    lineHeight = 18.sp,
+    fontWeight = FontWeight.Normal
+)
+
+private val RegisterLinkStyle = TextStyle(
+    fontFamily = InterFontFamily,
+    fontSize = 13.sp,
+    lineHeight = 18.sp,
+    fontWeight = FontWeight.Bold
+)

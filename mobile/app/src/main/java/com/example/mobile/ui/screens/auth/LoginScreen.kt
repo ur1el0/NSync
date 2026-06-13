@@ -1,4 +1,4 @@
-package com.example.mobile.ui.screens
+package com.example.mobile.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
