@@ -22,6 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "NSync"
+rootProject.name = "mobile"
 include(":app")
- 
