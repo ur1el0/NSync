@@ -2,3 +2,19 @@ __pycache__/
 db.sqlite3
 media/
 .env
+
+# IDE/editor local state
+.idea/
+.vscode/
+*.iml
+
+# Android Studio / Kotlin local state
+mobile/.idea/
+mobile/.kotlin/
+
+# Android/Gradle build outputs
+.gradle/
+build/
+mobile/.gradle/
+mobile/build/
+mobile/app/build/
