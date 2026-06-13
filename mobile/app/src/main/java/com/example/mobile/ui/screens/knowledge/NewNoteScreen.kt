@@ -41,7 +41,6 @@ import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncCardWhite
 import com.example.mobile.ui.theme.NSyncLightBackground
 import com.example.mobile.ui.theme.NSyncMutedText
-import com.example.mobile.ui.theme.ScreenBodyStyle
 import com.example.mobile.ui.theme.ScreenButtonStyle
 import com.example.mobile.ui.theme.ScreenCardBorder
 import com.example.mobile.ui.theme.ScreenSectionStyle

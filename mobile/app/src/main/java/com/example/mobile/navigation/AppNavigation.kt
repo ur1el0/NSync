@@ -136,6 +136,8 @@ fun AppNavigation() {
 
         composable(Routes.SESSION_COMPLETE) {
             SessionCompleteScreen(
+                onRouteClick = navigateBottom,
+                onReviewAgainClick = { navController.navigate(Routes.REVIEW_SESSION) },
                 onDashboardClick = {
                     navController.navigate(Routes.DASHBOARD) {
                         popUpTo(Routes.DASHBOARD) {
