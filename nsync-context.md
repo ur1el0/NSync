@@ -32,6 +32,72 @@ Django first -> API second -> Kotlin Android later
 
 The first priority is to make the Django data model and backend logic work before building the Android client.
 
+## Current Android Prototype State
+
+The Android app now has a Jetpack Compose static UI prototype in `mobile/`. This prototype is ahead of the original backend-first plan and is useful for the 50% mobile submission.
+
+Current mobile implementation:
+
+- Login and Register auth UI
+- Dashboard with top nav, user logo, level progress, stats, review action, and recent knowledge
+- Knowledge Base with a New Note button
+- Knowledge Detail page
+- New Note page with static form state
+- Review Cards list
+- Review Session with Show Answer / Hide Answer state
+- Session Complete result page
+- Mastery / Progress page
+- Profile page with reused dashboard stat icons and Logout
+- Bottom navigation for Dashboard, Knowledge, Flashcards, Mastery, and Profile
+- Static prototype data in `SampleData.kt`
+
+Current Android structure:
+
+```text
+mobile/app/src/main/java/com/example/mobile/
+  MainActivity.kt
+  data/
+    Models.kt
+    SampleData.kt
+  navigation/
+    AppNavigation.kt
+    Routes.kt
+  ui/
+    components/
+      AuthTextField.kt
+      BottomNavBar.kt
+      KnowledgeListCard.kt
+      MainScreenScaffold.kt
+      ReviewCardListItem.kt
+      ScreenButtons.kt
+      ScreenCards.kt
+    screens/
+      auth/
+        LoginScreen.kt
+        RegisterScreen.kt
+      dashboard/
+        DashboardScreen.kt
+      knowledge/
+        KnowledgeBaseScreen.kt
+        KnowledgeDetailScreen.kt
+        NewNoteScreen.kt
+      profile/
+        ProfileScreen.kt
+      progress/
+        MasteryScreen.kt
+      review/
+        ReviewCardsScreen.kt
+        ReviewSessionScreen.kt
+        SessionCompleteScreen.kt
+    theme/
+      Color.kt
+      ScreenStyles.kt
+      Theme.kt
+      Type.kt
+```
+
+Detailed screen explanations are stored in `docs/screens/`.
+
 ## Architecture Plan
 
 Recommended final architecture:

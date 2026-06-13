@@ -14,12 +14,13 @@ This repository contains a Django backend and a Kotlin Android mobile app.
 
 The current mobile goal is a 50% Jetpack Compose implementation that matches the finished prototype direction. It focuses on static sample data, navigation, and the main user interface.
 
-Implemented or planned for the 50% mobile version:
+Implemented in the current 50% mobile version:
 
 - Login / create account UI
 - Dashboard
 - Knowledge Base
 - Knowledge Detail
+- New Note
 - Review Cards
 - Review Session
 - Session Complete
@@ -66,7 +67,17 @@ NSync/
         ui/
           components/
           screens/
+            auth/
+            dashboard/
+            knowledge/
+            profile/
+            progress/
+            review/
           theme/
+
+  docs/
+    mobile-compose-guide.md
+    screens/
 
   nsync-context.md
   nsync-mobile-plan.md
@@ -74,11 +85,23 @@ NSync/
   readme.md
 ```
 
+## Screen Documentation
+
+Each Compose screen has a separate Markdown explanation in `docs/screens/`.
+
+Start here:
+
+```text
+docs/screens/README.md
+```
+
+Those files explain each screen's Kotlin path, route, purpose, included functions, navigation links, shared components, and styling sources.
+
 ## Android Mobile Plan
 
 The Android app uses Kotlin and Jetpack Compose.
 
-Recommended Kotlin structure:
+Current Kotlin structure:
 
 ```text
 mobile/app/src/main/java/com/example/mobile/
@@ -96,27 +119,35 @@ mobile/app/src/main/java/com/example/mobile/
 |-- ui/
 |   |-- components/
 |   |   |-- BottomNavBar.kt
-|   |   |-- KnowledgeCard.kt
-|   |   |-- ReviewCardItem.kt
-|   |   |-- StatCard.kt
-|   |   |-- MasteryCard.kt
-|   |   |-- PrimaryActionButton.kt
+|   |   |-- AuthTextField.kt
+|   |   |-- KnowledgeListCard.kt
+|   |   |-- MainScreenScaffold.kt
+|   |   |-- ReviewCardListItem.kt
+|   |   |-- ScreenButtons.kt
+|   |   |-- ScreenCards.kt
 |   |
 |   |-- screens/
-|   |   |-- AuthScreen.kt
-|   |   |-- RegisterScreen.kt
-|   |   |-- DashboardScreen.kt
-|   |   |-- KnowledgeBaseScreen.kt
-|   |   |-- KnowledgeDetailScreen.kt
-|   |   |-- ReviewCardsScreen.kt
-|   |   |-- ReviewSessionScreen.kt
-|   |   |-- SessionCompleteScreen.kt
-|   |   |-- MasteryScreen.kt
-|   |   |-- ProfileScreen.kt
-|   |   |-- SettingsScreen.kt
+|   |   |-- auth/
+|   |   |   |-- LoginScreen.kt
+|   |   |   |-- RegisterScreen.kt
+|   |   |-- dashboard/
+|   |   |   |-- DashboardScreen.kt
+|   |   |-- knowledge/
+|   |   |   |-- KnowledgeBaseScreen.kt
+|   |   |   |-- KnowledgeDetailScreen.kt
+|   |   |   |-- NewNoteScreen.kt
+|   |   |-- profile/
+|   |   |   |-- ProfileScreen.kt
+|   |   |-- progress/
+|   |   |   |-- MasteryScreen.kt
+|   |   |-- review/
+|   |   |   |-- ReviewCardsScreen.kt
+|   |   |   |-- ReviewSessionScreen.kt
+|   |   |   |-- SessionCompleteScreen.kt
 |   |
 |   |-- theme/
 |       |-- Color.kt
+|       |-- ScreenStyles.kt
 |       |-- Theme.kt
 |       |-- Type.kt
 ```
@@ -141,7 +172,7 @@ Then add:
 - `KnowledgeDetailScreen.kt`
 - `SessionCompleteScreen.kt`
 - `RegisterScreen.kt`
-- `SettingsScreen.kt`
+- `NewNoteScreen.kt`
 
 ## Backend
 

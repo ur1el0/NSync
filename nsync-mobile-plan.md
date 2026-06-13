@@ -18,8 +18,10 @@ Implemented in 50% version:
 - Dashboard
 - Knowledge Base
 - Knowledge Detail
+- New Note
 - Review Cards
 - Review Session
+- Session Complete
 - Mastery / Progress
 - User Profile
 - Bottom navigation
@@ -35,6 +37,18 @@ Not implemented yet:
 - Real editable forms
 - Persistent quiz scoring
 
+## Current Implementation Status
+
+The current Android app is a working static Compose prototype. Screens have been split by feature folder, shared wrappers/components live in `ui/components/`, and shared colors/type live in `ui/theme/`.
+
+Screen docs are separated by page in:
+
+```text
+docs/screens/
+```
+
+Use those Markdown files when explaining what each screen does, what functions it includes, where it is linked from, and what shared styling/components it uses.
+
 ## Screen Names
 
 Use these app labels in the UI:
@@ -48,22 +62,21 @@ Review Session
 Session Complete
 Mastery
 User Profile
-Settings
 ```
 
 Bottom navigation can stay short:
 
 ```text
 Dashboard
-Notes
-Cards
-Progress
+Knowledge
+Flashcards
+Mastery
 Profile
 ```
 
 Avoid calling the generalized feature "Flashcards" everywhere. In screen titles, prefer `Review Cards`.
 
-## Recommended File Structure
+## Current File Structure
 
 ```text
 mobile/app/src/main/java/com/example/mobile/
@@ -81,27 +94,35 @@ mobile/app/src/main/java/com/example/mobile/
 |-- ui/
 |   |-- components/
 |   |   |-- BottomNavBar.kt
-|   |   |-- KnowledgeCard.kt
-|   |   |-- ReviewCardItem.kt
-|   |   |-- StatCard.kt
-|   |   |-- MasteryCard.kt
-|   |   |-- PrimaryActionButton.kt
+|   |   |-- AuthTextField.kt
+|   |   |-- KnowledgeListCard.kt
+|   |   |-- MainScreenScaffold.kt
+|   |   |-- ReviewCardListItem.kt
+|   |   |-- ScreenButtons.kt
+|   |   |-- ScreenCards.kt
 |   |
 |   |-- screens/
-|   |   |-- AuthScreen.kt
-|   |   |-- RegisterScreen.kt
-|   |   |-- DashboardScreen.kt
-|   |   |-- KnowledgeBaseScreen.kt
-|   |   |-- KnowledgeDetailScreen.kt
-|   |   |-- ReviewCardsScreen.kt
-|   |   |-- ReviewSessionScreen.kt
-|   |   |-- SessionCompleteScreen.kt
-|   |   |-- MasteryScreen.kt
-|   |   |-- ProfileScreen.kt
-|   |   |-- SettingsScreen.kt
+|   |   |-- auth/
+|   |   |   |-- LoginScreen.kt
+|   |   |   |-- RegisterScreen.kt
+|   |   |-- dashboard/
+|   |   |   |-- DashboardScreen.kt
+|   |   |-- knowledge/
+|   |   |   |-- KnowledgeBaseScreen.kt
+|   |   |   |-- KnowledgeDetailScreen.kt
+|   |   |   |-- NewNoteScreen.kt
+|   |   |-- profile/
+|   |   |   |-- ProfileScreen.kt
+|   |   |-- progress/
+|   |   |   |-- MasteryScreen.kt
+|   |   |-- review/
+|   |   |   |-- ReviewCardsScreen.kt
+|   |   |   |-- ReviewSessionScreen.kt
+|   |   |   |-- SessionCompleteScreen.kt
 |   |
 |   |-- theme/
 |       |-- Color.kt
+|       |-- ScreenStyles.kt
 |       |-- Theme.kt
 |       |-- Type.kt
 ```
@@ -127,7 +148,12 @@ Each file should start with the package matching its folder:
 package com.example.mobile.data
 package com.example.mobile.navigation
 package com.example.mobile.ui.components
-package com.example.mobile.ui.screens
+package com.example.mobile.ui.screens.auth
+package com.example.mobile.ui.screens.dashboard
+package com.example.mobile.ui.screens.knowledge
+package com.example.mobile.ui.screens.profile
+package com.example.mobile.ui.screens.progress
+package com.example.mobile.ui.screens.review
 package com.example.mobile.ui.theme
 ```
 
@@ -156,6 +182,7 @@ data class KnowledgeItem(
 
 data class ReviewCard(
     val id: Int,
+    val knowledgeItemId: Int,
     val collection: String,
     val question: String,
     val answer: String,
@@ -190,7 +217,6 @@ Personal Finance
 Programming
 Interview Prep
 Writing Skills
-Networking
 ```
 
 Sample knowledge items:
@@ -223,19 +249,24 @@ Answer: A monthly budget helps track income, expenses, savings, and spending so 
 Collection: Personal Finance
 Difficulty: Easy
 
-Question: What is a VLAN?
-Answer: A VLAN is a logical network segment that separates devices within the same physical network.
-Collection: Networking
-Difficulty: Hard
+Question: What does Django REST Framework help you build?
+Answer: Django REST Framework helps build API endpoints that let web or mobile clients send and receive structured data.
+Collection: Programming
+Difficulty: Medium
 
-Question: What is a thesis statement?
-Answer: A thesis statement clearly presents the main argument or purpose of a written work.
-Collection: Writing Skills
+Question: What makes a strong interview answer?
+Answer: A strong interview answer is specific, honest, and connected to real project experience.
+Collection: Interview Prep
 Difficulty: Easy
 
 Question: What is the purpose of a Django model?
 Answer: A Django model defines the structure and behavior of data stored in the database.
 Collection: Programming
+Difficulty: Medium
+
+Question: What is the difference between authentication and authorization?
+Answer: Authentication verifies identity, while authorization determines what actions or resources a user can access.
+Collection: Interview Prep
 Difficulty: Medium
 ```
 
@@ -250,6 +281,7 @@ object Routes {
     const val DASHBOARD = "dashboard"
     const val KNOWLEDGE_BASE = "knowledge_base"
     const val KNOWLEDGE_DETAIL = "knowledge_detail"
+    const val NEW_NOTE = "new_note"
     const val REVIEW_CARDS = "review_cards"
     const val REVIEW_SESSION = "review_session"
     const val SESSION_COMPLETE = "session_complete"
@@ -277,11 +309,12 @@ Register -> Dashboard
 Dashboard -> Review Session
 Dashboard -> Knowledge Base
 Knowledge Base -> Knowledge Detail
+Knowledge Base -> New Note
 Knowledge Detail -> Review Session
 Review Cards -> Review Session
 Review Session -> Session Complete
 Session Complete -> Dashboard
-Profile -> Settings
+Profile -> Login on logout
 ```
 
 ### 5. MainActivity.kt
@@ -309,9 +342,9 @@ Tabs:
 
 ```text
 Dashboard
-Notes
-Cards
-Progress
+Knowledge
+Flashcards
+Mastery
 Profile
 ```
 
@@ -319,17 +352,15 @@ Route mapping:
 
 ```text
 Dashboard -> Routes.DASHBOARD
-Notes -> Routes.KNOWLEDGE_BASE
-Cards -> Routes.REVIEW_CARDS
-Progress -> Routes.MASTERY
+Knowledge -> Routes.KNOWLEDGE_BASE
+Flashcards -> Routes.REVIEW_CARDS
+Mastery -> Routes.MASTERY
 Profile -> Routes.PROFILE
 ```
 
-Important: Rename `BottomNarBar.kt` to `BottomNavBar.kt` if it still has the typo.
-
 ### 7. DashboardScreen.kt
 
-Use `Scaffold` here.
+Use `MainScreenScaffold` here.
 
 Show:
 
@@ -341,7 +372,7 @@ Show:
 - Accuracy
 - Start Review button
 - Recent Knowledge section
-- One or two `KnowledgeCard` components
+- Recent knowledge card
 - Bottom navigation
 
 ### 8. KnowledgeBaseScreen.kt
@@ -353,7 +384,7 @@ Show:
 - Header: `Knowledge Base`
 - Subtitle: `Capture, search, and organize important ideas.`
 - Knowledge cards from sample data
-- Floating add button
+- New Note button
 - Bottom navigation
 
 No real search/filter needed yet.
@@ -459,30 +490,14 @@ Show:
 - Learning Goal: Build durable knowledge
 - Day streak
 - XP progress
-- Settings button
 - Logout button
 - Bottom navigation
-
-### 15. SettingsScreen.kt
-
-Optional but useful because it exists in the prototype.
-
-Show static settings:
-
-- Email address
-- Daily review goal
-- Reminder time
-- Review difficulty
-- Streak reminders
-- Notifications
-- Appearance
-- Log out
 
 ## Reusable Components
 
 Create these only when needed. Do not overbuild early.
 
-### KnowledgeCard.kt
+### KnowledgeListCard.kt
 
 Used in Dashboard and Knowledge Base.
 
@@ -497,7 +512,7 @@ updatedLabel
 onClick
 ```
 
-### ReviewCardItem.kt
+### ReviewCardListItem.kt
 
 Used in Review Cards and Knowledge Detail.
 
@@ -535,7 +550,7 @@ context
 masteryPercent
 ```
 
-### PrimaryActionButton.kt
+### PrimaryScreenButton.kt
 
 Reusable big blue button.
 
@@ -591,7 +606,7 @@ Then add:
 KnowledgeDetailScreen.kt
 SessionCompleteScreen.kt
 RegisterScreen.kt
-SettingsScreen.kt
+NewNoteScreen.kt
 ```
 
 ## PDF Submission Notes
