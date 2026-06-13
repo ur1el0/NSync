@@ -9,3 +9,12 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+
+// Color Palette for NSync
+val NSyncBlue = Color(0xFF005BC8)
+val NSyncLightBackground = Color(0xFFF8F9FF)
+val NSyncCardWhite = Color(0xFFFFFFFF)
+val NSyncMutedText = Color(0xFF5F6675)
+val NSyncRed = Color(0xFFD21F2B)
+val NSyncBorder = Color(0xFFE1E5EF)
