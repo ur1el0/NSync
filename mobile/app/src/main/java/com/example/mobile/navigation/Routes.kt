@@ -1,7 +1,6 @@
 package com.example.mobile.navigation
 
-import com.example.mobile.navigation.AppNavigation
-import com.example.mobile.ui.screens.DashboardScreen
+import com.example.mobile.R
 
 object Routes {
     const val LOGIN = "login"
@@ -9,6 +8,7 @@ object Routes {
     const val DASHBOARD = "dashboard"
     const val KNOWLEDGE_BASE = "knowledge_base"
     const val KNOWLEDGE_DETAIL = "knowledge_detail"
+    const val NEW_NOTE = "new_note"
     const val REVIEW_CARDS = "review_cards"
     const val REVIEW_SESSION = "review_session"
     const val SESSION_COMPLETE = "session_complete"
@@ -19,28 +19,34 @@ object Routes {
 
 data class BottomNavRoute(
     val label: String,
-    val route: String
+    val route: String,
+    val iconRes: Int
 )
 
 val bottomNavRoutes = listOf(
     BottomNavRoute(
         label = "Dashboard",
-        route = Routes.DASHBOARD
+        route = Routes.DASHBOARD,
+        iconRes = R.drawable.ic_grid
     ),
     BottomNavRoute(
-        label = "Notes",
-        route = Routes.KNOWLEDGE_BASE
+        label = "Knowledge",
+        route = Routes.KNOWLEDGE_BASE,
+        iconRes = R.drawable.ic_briefcase
     ),
     BottomNavRoute(
-        label = "Cards",
-        route = Routes.REVIEW_CARDS
+        label = "Flashcards",
+        route = Routes.REVIEW_CARDS,
+        iconRes = R.drawable.ic_flashcard
     ),
     BottomNavRoute(
-        label = "Progress",
-        route = Routes.MASTERY
+        label = "Mastery",
+        route = Routes.MASTERY,
+        iconRes = R.drawable.ic_chart
     ),
     BottomNavRoute(
         label = "Profile",
-        route = Routes.PROFILE
+        route = Routes.PROFILE,
+        iconRes = R.drawable.ic_profile
     )
 )
