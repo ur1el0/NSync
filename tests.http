@@ -1,0 +1,31 @@
+### Health check
+GET http://127.0.0.1:8000/api/health/
+
+### Get notes
+GET http://127.0.0.1:8000/api/notes/
+
+### Get flashcards
+GET http://127.0.0.1:8000/api/flashcards/
+
+### Get progress
+GET http://127.0.0.1:8000/api/progress/
+
+### Complete review
+POST http://127.0.0.1:8000/api/review/complete/
+Content-Type: application/json
+
+{
+  "score": 4,
+  "total_questions": 5,
+  "xp_earned": 125
+}
+
+### New Note
+POST http://127.0.0.1:8000/api/notes/
+Content-Type: application/json
+
+{
+    "title": "Django REST Framework",
+    "content": "DRF helps Django expose data through API endpoints.",
+    "tag": "Programming"
+}

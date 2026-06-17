@@ -19,7 +19,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     serializer_class = NoteSerializer
 
 
-class FlashcardViewset(viewsets.ModelViewSet):
+class FlashcardViewSet(viewsets.ModelViewSet):
     serializer_class = FlashcardSerializer
 
     def get_queryset(self):
@@ -81,6 +81,6 @@ def calculate_level(total_xp):
         return 4
     if total_xp >= 250:
         return 3
-    if total_xp >= 500:
+    if total_xp >= 100:
         return 2
     return 1

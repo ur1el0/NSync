@@ -1,5 +1,5 @@
-from .models import User, Note, Flashcard, QuizAttempt, UserProgress
 from rest_framework import serializers
+from .models import User, Note, Flashcard, QuizAttempt, UserProgress
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,47 +7,51 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-            'email'
-            'password'
+            'email',
         ]
 
-        def __str__(self):
-            return self.name
-        
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Note
         fields = [
+            'id',
             'title',
-            'content'
+            'content',
+            'tag',
+            'created_at',
+            'updated_at',
         ]
 
-        def __str__(self):
-            return self.title
-        
+
 class FlashcardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flashcard
         fields = [
+            'id',
             'connected_note',
             'question',
             'answer',
+            'difficulty',
+            'mastery_level',
         ]
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizAttempt
         fields = [
+            'id',
             'score',
             'total_questions',
             'xp_earned',
+            'date_taken',
         ]
 
 class UserProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProgress
         fields = [
+            'id',
             'total_xp',
             'level',
             'streak',
