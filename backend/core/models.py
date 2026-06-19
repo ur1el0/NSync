@@ -7,8 +7,6 @@ class User(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField(blank=True)
 
-    def __str__(self):
-        return self.name
 
 class Note(models.Model):
     title = models.CharField(max_length=200)
@@ -17,11 +15,13 @@ class Note(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.title
 
 class Flashcard(models.Model):
-    connected_note = models.ForeignKey(Note, on_delete=models.CASCADE)
+    connected_note = models.ForeignKey(
+        Note, 
+        on_delete=models.CASCADE, 
+        related_name="flashcards"
+    )
     question = models.TextField()
     answer = models.TextField()
     difficulty = models.CharField(max_length=50, blank=True)
@@ -30,8 +30,6 @@ class Flashcard(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(3)],
     )
 
-    def __str__(self):
-        return self.question
 
 class QuizAttempt(models.Model):
     score = models.IntegerField(default=0)
