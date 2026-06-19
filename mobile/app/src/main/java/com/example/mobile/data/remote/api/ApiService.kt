@@ -1,14 +1,14 @@
 package com.example.mobile.data.remote.api
 
+import com.example.mobile.data.remote.dto.CreateNoteRequestDto
 import com.example.mobile.data.remote.dto.NoteDto
+import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.DELETE
-import retrofit2.http.PATCH
-import retrofit2.http.Query
 import retrofit2.http.Path
 
 interface ApiService {
@@ -16,22 +16,18 @@ interface ApiService {
     // Get notes
     @GET("/api/notes/")
     suspend fun getNotes(): Response<List<NoteDto>>
-
     @GET("/api/notes/{id}/")
     suspend fun getNoteById(@Path("id") id: Int): Response<NoteDto>
 
-
     // Create note
     @POST("/api/notes/")
-    suspend fun createNote(@Body note: NoteDto): Response<NoteDto>
+    suspend fun createNote(@Body note: CreateNoteRequestDto): Response<NoteDto>
 
-    // Update note
     @PUT("/api/notes/{id}/")
-    suspend fun updateNote(@Path("id") id: Int, @Body note: NoteDto): Response<NoteDto>
-
-    // Partial update note
-    @PATCH("/api/notes/{id}/")
-    suspend fun partialUpdateNote(@Path("id") id: Int, @Body note: NoteDto): Response<NoteDto>
+    suspend fun updateNote(
+        @Path("id") id: Int,
+        @Body note: UpdateNoteRequestDto
+    ): Response<NoteDto>
 
     // Delete note
     @DELETE("/api/notes/{id}/")

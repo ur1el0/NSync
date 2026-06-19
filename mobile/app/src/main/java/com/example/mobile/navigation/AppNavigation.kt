@@ -1,9 +1,11 @@
 package com.example.mobile.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mobile.ui.screens.auth.LoginScreen
 import com.example.mobile.ui.screens.auth.RegisterScreen
 import com.example.mobile.ui.screens.dashboard.DashboardScreen
@@ -77,7 +79,7 @@ fun AppNavigation() {
         composable(Routes.DASHBOARD) {
             DashboardScreen(
                 onStartReviewClick = { navController.navigate(Routes.REVIEW_SESSION) },
-                onKnowledgeClick = { navController.navigate(Routes.KNOWLEDGE_DETAIL) },
+                onKnowledgeClick = { item -> navController.navigate(Routes.knowledgeDetail(item.id)) },
                 onAddClick = { navController.navigate(Routes.REVIEW_CARDS) },
                 onRouteClick = navigateBottom
             )
@@ -85,7 +87,7 @@ fun AppNavigation() {
 
         composable(Routes.KNOWLEDGE_BASE) {
             KnowledgeBaseScreen(
-                onKnowledgeClick = { navController.navigate(Routes.KNOWLEDGE_DETAIL) },
+                onKnowledgeClick = { item -> navController.navigate(Routes.knowledgeDetail(item.id)) },
                 onNewNoteClick = { navController.navigate(Routes.NEW_NOTE) },
                 onRouteClick = navigateBottom
             )
@@ -99,8 +101,29 @@ fun AppNavigation() {
             )
         }
 
-        composable(Routes.KNOWLEDGE_DETAIL) {
+        composable(
+            route = Routes.EDIT_NOTE,
+            arguments = listOf(navArgument("noteId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val noteId = backStackEntry.arguments?.getInt("noteId") ?: return@composable
+            NewNoteScreen(
+                noteId = noteId,
+                onBackClick = { navController.popBackStack() },
+                onSaveClick = { navController.popBackStack(Routes.KNOWLEDGE_BASE, inclusive = false) },
+                onRouteClick = navigateBottom
+            )
+        }
+
+        composable(
+            route = Routes.KNOWLEDGE_DETAIL,
+            arguments = listOf(navArgument("noteId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val noteId = backStackEntry.arguments?.getInt("noteId") ?: return@composable
             KnowledgeDetailScreen(
+                noteId = noteId,
+                onBackClick = { navController.popBackStack() },
+                onEditClick = { navController.navigate(Routes.editNote(noteId)) },
+                onDeleted = { navController.popBackStack(Routes.KNOWLEDGE_BASE, inclusive = false) },
                 onStartReviewClick = { navController.navigate(Routes.REVIEW_SESSION) },
                 onRouteClick = navigateBottom
             )

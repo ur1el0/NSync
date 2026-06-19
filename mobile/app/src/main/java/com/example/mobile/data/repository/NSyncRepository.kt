@@ -2,7 +2,9 @@ package com.example.mobile.data.repository
 
 import com.example.mobile.data.KnowledgeItem
 import com.example.mobile.data.remote.RetrofitClient
+import com.example.mobile.data.remote.dto.CreateNoteRequestDto
 import com.example.mobile.data.remote.dto.NoteDto
+import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
 
 class NSyncRepository {
     private val apiService = RetrofitClient.apiService
@@ -25,7 +27,12 @@ class NSyncRepository {
         }
     }
 
-    suspend fun createNote(note: NoteDto): NoteDto? {
+    suspend fun createNote(title: String, content: String, tag: String): NoteDto? {
+        val note = CreateNoteRequestDto(
+            title = title,
+            content = content,
+            tag = tag
+        )
         val response = apiService.createNote(note)
         return if (response.isSuccessful) {
             response.body()
@@ -34,17 +41,13 @@ class NSyncRepository {
         }
     }
 
-    suspend fun updateNote(id: Int, note: NoteDto): NoteDto? {
+    suspend fun updateNote(id: Int, title: String, content: String, tag: String): NoteDto? {
+        val note = UpdateNoteRequestDto(
+            title = title,
+            content = content,
+            tag = tag
+        )
         val response = apiService.updateNote(id, note)
-        return if (response.isSuccessful) {
-            response.body()
-        } else {
-            null
-        }
-    }
-
-    suspend fun partialUpdateNote(id: Int, note: NoteDto): NoteDto? {
-        val response = apiService.partialUpdateNote(id, note)
         return if (response.isSuccessful) {
             response.body()
         } else {
@@ -57,12 +60,16 @@ class NSyncRepository {
         return response.isSuccessful
     }
 
+    suspend fun getKnowledgeItemById(id: Int): KnowledgeItem? {
+        return getNoteById(id)?.toKnowledgeItem()
+    }
+
     suspend fun getKnowledgeItems(): List<KnowledgeItem> {
         return try {
             getNotes().orEmpty().map { note ->
                 note.toKnowledgeItem()
             }
-        } catch (e: Exception) {
+        } catch (e: Exception) {    
             emptyList()
         }
     }

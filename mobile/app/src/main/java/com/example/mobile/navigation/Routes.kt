@@ -7,13 +7,18 @@ object Routes {
     const val REGISTER = "register"
     const val DASHBOARD = "dashboard"
     const val KNOWLEDGE_BASE = "knowledge_base"
-    const val KNOWLEDGE_DETAIL = "knowledge_detail"
+    const val KNOWLEDGE_DETAIL = "knowledge_detail/{noteId}"
     const val NEW_NOTE = "new_note"
+    const val EDIT_NOTE = "edit_note/{noteId}"
     const val REVIEW_CARDS = "review_cards"
     const val REVIEW_SESSION = "review_session"
     const val SESSION_COMPLETE = "session_complete"
     const val MASTERY = "mastery"
     const val PROFILE = "profile"
+
+    fun knowledgeDetail(noteId: Int): String = "knowledge_detail/$noteId"
+
+    fun editNote(noteId: Int): String = "edit_note/$noteId"
 }
 
 data class BottomNavRoute(

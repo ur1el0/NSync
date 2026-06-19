@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,18 +47,42 @@ import com.example.mobile.ui.theme.ScreenCardBorder
 import com.example.mobile.ui.theme.ScreenSectionStyle
 import com.example.mobile.ui.theme.ScreenSmallBoldStyle
 
+import com.example.mobile.ui.viewmodel.NewNoteViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 @Composable
 fun NewNoteScreen(
+    noteId: Int? = null,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
-    onRouteClick: (String) -> Unit
+    onRouteClick: (String) -> Unit,
+    viewModel: NewNoteViewModel = viewModel()
 ) {
-    var title by remember { mutableStateOf("Building a Simple Monthly Budget") }
-    var collection by remember { mutableStateOf("Personal Finance") }
+    val isEditing = noteId != null
+    var title by remember { mutableStateOf("") }
+    var collection by remember { mutableStateOf("") }
     var source by remember { mutableStateOf("Money management") }
     var context by remember { mutableStateOf("Training") }
     var content by remember {
-        mutableStateOf("Capture reusable ideas, definitions, steps, or explanations here...")
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(noteId) {
+        noteId?.let { viewModel.loadNote(it) }
+    }
+
+    LaunchedEffect(viewModel.loaded) {
+        if (viewModel.loaded) {
+            title = viewModel.title
+            collection = viewModel.tag
+            content = viewModel.content
+        }
+    }
+
+    LaunchedEffect(viewModel.saved) {
+        if (viewModel.saved) {
+            onSaveClick()
+        }
     }
 
     Scaffold(
@@ -90,10 +115,29 @@ fun NewNoteScreen(
                         color = NSyncBlue,
                         style = NewNoteTopActionStyle
                     )
-                    Text("New Note", color = NSyncBlue, style = ScreenSectionStyle)
                     Text(
-                        text = "Save",
-                        modifier = Modifier.clickable(onClick = onSaveClick),
+                        if (isEditing) "Edit Note" else "New Note",
+                        color = NSyncBlue,
+                        style = ScreenSectionStyle
+                    )
+                    Text(
+                        text = if (viewModel.isSaving) "Saving" else "Save",
+                        modifier = Modifier.clickable {
+                            if (isEditing) {
+                                viewModel.updateNote(
+                                    id = noteId,
+                                    title = title,
+                                    content = content,
+                                    tag = collection
+                                )
+                            } else {
+                                viewModel.createNote(
+                                    title = title,
+                                    content = content,
+                                    tag = collection
+                                )
+                            }
+                        },
                         color = NSyncBlue,
                         style = ScreenSmallBoldStyle
                     )
@@ -201,15 +245,46 @@ fun NewNoteScreen(
                         Text("Cancel", color = NSyncBlue, style = ScreenButtonStyle)
                     }
                     Button(
-                        onClick = onSaveClick,
+                        onClick = {
+                            if (isEditing) {
+                                viewModel.updateNote(
+                                    id = noteId,
+                                    title = title,
+                                    content = content,
+                                    tag = collection
+                                )
+                            } else {
+                                viewModel.createNote(
+                                    title = title,
+                                    content = content,
+                                    tag = collection
+                                )
+                            }
+                        },
                         modifier = Modifier
                             .weight(1f)
                             .height(52.dp),
                         shape = RoundedCornerShape(999.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue)
                     ) {
-                        Text("Save Note", color = Color.White, style = ScreenButtonStyle)
+                        Text(
+                            if (viewModel.isSaving) {
+                                "Saving..."
+                            } else if (isEditing) {
+                                "Update Note"
+                            } else {
+                                "Save Note"
+                            },
+                            color = Color.White,
+                            style = ScreenButtonStyle
+                        )
                     }
+                }
+            }
+
+            viewModel.error?.let { message ->
+                item {
+                    Text(message, color = Color(0xFFD21F2B), style = ScreenSmallBoldStyle)
                 }
             }
 
