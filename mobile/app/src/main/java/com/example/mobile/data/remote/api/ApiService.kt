@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.DELETE
-import retrofit2.http.Patch
+import retrofit2.http.PATCH
 import retrofit2.http.Query
 import retrofit2.http.Path
 
@@ -15,7 +15,7 @@ interface ApiService {
     // Notes API endpoints
     // Get notes
     @GET("/api/notes/")
-    suspend fun getNotes(): Response<NoteDto>
+    suspend fun getNotes(): Response<List<NoteDto>>
 
     @GET("/api/notes/{id}/")
     suspend fun getNoteById(@Path("id") id: Int): Response<NoteDto>
@@ -30,7 +30,7 @@ interface ApiService {
     suspend fun updateNote(@Path("id") id: Int, @Body note: NoteDto): Response<NoteDto>
 
     // Partial update note
-    @Patch("/api/notes/{id}/")
+    @PATCH("/api/notes/{id}/")
     suspend fun partialUpdateNote(@Path("id") id: Int, @Body note: NoteDto): Response<NoteDto>
 
     // Delete note
