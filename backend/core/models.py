@@ -41,6 +41,7 @@ class UserProgress(models.Model):
     total_xp = models.PositiveIntegerField(default=0)
     level = models.PositiveIntegerField(default=1)
     streak = models.PositiveIntegerField(default=0)
+    last_reviewed_on = models.DateField(null=True, blank=True)
     total_reviews = models.PositiveIntegerField(default=0)
     correct_reviews = models.PositiveIntegerField(default=0)
     accuracy = models.FloatField(default=0.0)
