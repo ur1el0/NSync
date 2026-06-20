@@ -1,8 +1,11 @@
 package com.example.mobile.data.remote.api
 
 import com.example.mobile.data.remote.dto.CreateNoteRequestDto
+import com.example.mobile.data.remote.dto.CreateFlashcardRequestDto
+import com.example.mobile.data.remote.dto.FlashcardDto
 import com.example.mobile.data.remote.dto.NoteDto
 import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
+import com.example.mobile.data.remote.dto.UpdateFlashcardRequestDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -32,5 +35,27 @@ interface ApiService {
     // Delete note
     @DELETE("/api/notes/{id}/")
     suspend fun deleteNote(@Path("id") id: Int): Response<Unit>
-    
+
+
+    // Flashcards API endpoints
+    // Get flashcards
+    @GET("/api/flashcards/")
+    suspend fun getFlashcards(): Response<List<FlashcardDto>>
+    // Get flashcard by ID
+    @GET("/api/flashcards/{id}/")
+    suspend fun getFlashcardById(@Path("id") id: Int): Response<FlashcardDto>
+
+    @POST("/api/flashcards/")
+    suspend fun createFlashcard(
+        @Body flashcard: CreateFlashcardRequestDto
+    ): Response<FlashcardDto>
+
+    @PUT("/api/flashcards/{id}/")
+    suspend fun updateFlashcard(
+        @Path("id") id: Int,
+        @Body flashcard: UpdateFlashcardRequestDto
+    ): Response<FlashcardDto>
+
+    @DELETE("/api/flashcards/{id}/")
+    suspend fun deleteFlashcard(@Path("id") id: Int): Response<Unit>
 }

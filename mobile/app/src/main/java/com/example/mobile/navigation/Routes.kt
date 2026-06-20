@@ -10,6 +10,10 @@ object Routes {
     const val KNOWLEDGE_DETAIL = "knowledge_detail/{noteId}"
     const val NEW_NOTE = "new_note"
     const val EDIT_NOTE = "edit_note/{noteId}"
+    const val NEW_FLASHCARD = "new_flashcard/{noteId}"
+    const val FLASHCARD_DETAIL = "flashcard_detail/{cardId}"
+    const val EDIT_FLASHCARD = "edit_flashcard/{cardId}"
+    const val REVIEW_SESSION_CARD = "review_session/{cardId}"
     const val REVIEW_CARDS = "review_cards"
     const val REVIEW_SESSION = "review_session"
     const val SESSION_COMPLETE = "session_complete"
@@ -19,6 +23,14 @@ object Routes {
     fun knowledgeDetail(noteId: Int): String = "knowledge_detail/$noteId"
 
     fun editNote(noteId: Int): String = "edit_note/$noteId"
+
+    fun newFlashcard(noteId: Int): String = "new_flashcard/$noteId"
+
+    fun flashcardDetail(cardId: Int): String = "flashcard_detail/$cardId"
+
+    fun editFlashcard(cardId: Int): String = "edit_flashcard/$cardId"
+
+    fun reviewSession(cardId: Int): String = "review_session/$cardId"
 }
 
 data class BottomNavRoute(
