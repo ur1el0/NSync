@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -56,6 +59,15 @@ def complete_review(request):
     progress.total_xp += xp_earned
     progress.total_reviews += total_questions
     progress.correct_reviews += score
+
+    today = timezone.localdate()
+    if progress.last_reviewed_on == today:
+        pass
+    elif progress.last_reviewed_on == today - timedelta(days=1):
+        progress.streak += 1
+    else:
+        progress.streak = 1
+    progress.last_reviewed_on = today
 
     if progress.total_reviews > 0:
         progress.accuracy = progress.correct_reviews / progress.total_reviews * 100
