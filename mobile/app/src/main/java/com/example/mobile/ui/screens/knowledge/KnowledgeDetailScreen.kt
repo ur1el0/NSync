@@ -2,6 +2,7 @@ package com.example.mobile.ui.screens.knowledge
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -29,6 +30,7 @@ fun KnowledgeDetailScreen(
     noteId: Int,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
+    onAddReviewCardClick: () -> Unit,
     onDeleted: () -> Unit,
     onStartReviewClick: () -> Unit,
     onRouteClick: (String) -> Unit,
@@ -98,6 +100,15 @@ fun KnowledgeDetailScreen(
                 text = "Start Review",
                 onClick = onStartReviewClick
             )
+        }
+
+        item {
+            OutlinedButton(
+                onClick = onAddReviewCardClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Add Review Card", color = NSyncBlue, style = ScreenButtonStyle)
+            }
         }
 
         item {

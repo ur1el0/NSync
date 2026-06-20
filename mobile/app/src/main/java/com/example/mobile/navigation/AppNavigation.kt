@@ -15,6 +15,8 @@ import com.example.mobile.ui.screens.knowledge.NewNoteScreen
 import com.example.mobile.ui.screens.profile.ProfileScreen
 import com.example.mobile.ui.screens.progress.MasteryScreen
 import com.example.mobile.ui.screens.review.ReviewCardsScreen
+import com.example.mobile.ui.screens.review.NewFlashcardScreen
+import com.example.mobile.ui.screens.review.FlashcardDetailScreen
 import com.example.mobile.ui.screens.review.ReviewSessionScreen
 import com.example.mobile.ui.screens.review.SessionCompleteScreen
 
@@ -123,8 +125,48 @@ fun AppNavigation() {
                 noteId = noteId,
                 onBackClick = { navController.popBackStack() },
                 onEditClick = { navController.navigate(Routes.editNote(noteId)) },
+                onAddReviewCardClick = { navController.navigate(Routes.newFlashcard(noteId)) },
                 onDeleted = { navController.popBackStack(Routes.KNOWLEDGE_BASE, inclusive = false) },
                 onStartReviewClick = { navController.navigate(Routes.REVIEW_SESSION) },
+                onRouteClick = navigateBottom
+            )
+        }
+
+        composable(
+            route = Routes.NEW_FLASHCARD,
+            arguments = listOf(navArgument("noteId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val noteId = backStackEntry.arguments?.getInt("noteId") ?: return@composable
+            NewFlashcardScreen(
+                noteId = noteId,
+                onBackClick = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Routes.EDIT_FLASHCARD,
+            arguments = listOf(navArgument("cardId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val cardId = backStackEntry.arguments?.getInt("cardId") ?: return@composable
+            NewFlashcardScreen(
+                cardId = cardId,
+                onBackClick = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Routes.FLASHCARD_DETAIL,
+            arguments = listOf(navArgument("cardId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val cardId = backStackEntry.arguments?.getInt("cardId") ?: return@composable
+            FlashcardDetailScreen(
+                cardId = cardId,
+                onBackClick = { navController.popBackStack() },
+                onEditClick = { navController.navigate(Routes.editFlashcard(cardId)) },
+                onStartReviewClick = { navController.navigate(Routes.reviewSession(cardId)) },
+                onDeleted = { navController.popBackStack(Routes.REVIEW_CARDS, inclusive = false) },
                 onRouteClick = navigateBottom
             )
         }
@@ -132,12 +174,24 @@ fun AppNavigation() {
         composable(Routes.REVIEW_CARDS) {
             ReviewCardsScreen(
                 onStartReviewClick = { navController.navigate(Routes.REVIEW_SESSION) },
+                onCardClick = { cardId -> navController.navigate(Routes.flashcardDetail(cardId)) },
                 onRouteClick = navigateBottom
             )
         }
 
         composable(Routes.REVIEW_SESSION) {
             ReviewSessionScreen(
+                onCompleteClick = { navController.navigate(Routes.SESSION_COMPLETE) }
+            )
+        }
+
+        composable(
+            route = Routes.REVIEW_SESSION_CARD,
+            arguments = listOf(navArgument("cardId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val cardId = backStackEntry.arguments?.getInt("cardId") ?: return@composable
+            ReviewSessionScreen(
+                cardId = cardId,
                 onCompleteClick = { navController.navigate(Routes.SESSION_COMPLETE) }
             )
         }
