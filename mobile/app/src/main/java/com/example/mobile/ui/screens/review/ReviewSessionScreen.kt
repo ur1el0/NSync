@@ -34,10 +34,11 @@ import com.example.mobile.ui.viewmodel.ReviewSessionViewModel
 @Composable
 fun ReviewSessionScreen(
     onCompleteClick: () -> Unit,
+    noteId: Int? = null,
     cardId: Int? = null,
     viewModel: ReviewSessionViewModel = viewModel()
 ) {
-    LaunchedEffect(cardId) { viewModel.loadSession(cardId) }
+    LaunchedEffect(noteId, cardId) { viewModel.loadSession(noteId, cardId) }
     var showAnswer by remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel.currentIndex) {
@@ -102,7 +103,7 @@ fun ReviewSessionScreen(
             item {
                 PrimaryScreenButton(
                     text = if (showAnswer) {
-                        if (viewModel.hasNextCard) "Next Card" else "Finish Review"
+                        "Continue"
                     } else {
                         "Show Answer"
                     },
@@ -116,17 +117,17 @@ fun ReviewSessionScreen(
                 )
             }
 
-            item {
-                Text(
-                    text = if (viewModel.hasNextCard) "Skip for now" else "Finish review",
+            if (viewModel.hasNextCard) {
+                item {
+                    Text(
+                    text = "Skip card",
                     color = NSyncBlue,
                     style = ScreenBodyStyle,
                     modifier = Modifier
                         .padding(top = 2.dp)
-                        .clickable {
-                            if (viewModel.hasNextCard) viewModel.nextCard() else onCompleteClick()
-                        }
+                        .clickable { viewModel.nextCard() }
                 )
+                }
             }
         } ?: item {
             if (!viewModel.isLoading) {

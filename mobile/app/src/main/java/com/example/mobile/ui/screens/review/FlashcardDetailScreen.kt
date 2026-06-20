@@ -28,7 +28,7 @@ fun FlashcardDetailScreen(
     cardId: Int,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
-    onStartReviewClick: () -> Unit,
+    onStartSessionClick: (Int) -> Unit,
     onDeleted: () -> Unit,
     onRouteClick: (String) -> Unit,
     viewModel: FlashcardDetailViewModel = viewModel()
@@ -69,7 +69,12 @@ fun FlashcardDetailScreen(
                 progress = card.masteryPercent / 100f
             )
         }
-        item { PrimaryScreenButton("Start Review", onStartReviewClick) }
+        item {
+            PrimaryScreenButton(
+                text = "Start Note Session",
+                onClick = { onStartSessionClick(card.knowledgeItemId) }
+            )
+        }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f)) {

@@ -165,7 +165,9 @@ fun AppNavigation() {
                 cardId = cardId,
                 onBackClick = { navController.popBackStack() },
                 onEditClick = { navController.navigate(Routes.editFlashcard(cardId)) },
-                onStartReviewClick = { navController.navigate(Routes.reviewSession(cardId)) },
+                onStartSessionClick = { noteId ->
+                    navController.navigate(Routes.reviewSessionForNote(noteId))
+                },
                 onDeleted = { navController.popBackStack(Routes.REVIEW_CARDS, inclusive = false) },
                 onRouteClick = navigateBottom
             )
@@ -173,8 +175,10 @@ fun AppNavigation() {
 
         composable(Routes.REVIEW_CARDS) {
             ReviewCardsScreen(
-                onStartReviewClick = { navController.navigate(Routes.REVIEW_SESSION) },
-                onCardClick = { cardId -> navController.navigate(Routes.flashcardDetail(cardId)) },
+                onStartSessionClick = { noteId ->
+                    navController.navigate(Routes.reviewSessionForNote(noteId))
+                },
+                onAddCardClick = { noteId -> navController.navigate(Routes.newFlashcard(noteId)) },
                 onRouteClick = navigateBottom
             )
         }
@@ -186,12 +190,12 @@ fun AppNavigation() {
         }
 
         composable(
-            route = Routes.REVIEW_SESSION_CARD,
-            arguments = listOf(navArgument("cardId") { type = NavType.IntType })
+            route = Routes.REVIEW_SESSION_NOTE,
+            arguments = listOf(navArgument("noteId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val cardId = backStackEntry.arguments?.getInt("cardId") ?: return@composable
+            val noteId = backStackEntry.arguments?.getInt("noteId") ?: return@composable
             ReviewSessionScreen(
-                cardId = cardId,
+                noteId = noteId,
                 onCompleteClick = { navController.navigate(Routes.SESSION_COMPLETE) }
             )
         }

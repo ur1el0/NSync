@@ -96,15 +96,13 @@ class NSyncRepository {
 
 
     suspend fun getReviewCards(): List<ReviewCard> {
-        return try {
-            val response = apiService.getFlashcards()
-            if (!response.isSuccessful) return emptyList()
+        val response = apiService.getFlashcards()
+        if (!response.isSuccessful) {
+            throw IllegalStateException("Request failed with HTTP ${response.code()}.")
+        }
 
-            response.body().orEmpty().map { flashcard ->
-                flashcard.toReviewCard()
-            }
-        } catch (e: Exception) {
-            emptyList()
+        return response.body().orEmpty().map { flashcard ->
+            flashcard.toReviewCard()
         }
     }
 
@@ -161,6 +159,7 @@ class NSyncRepository {
             id = id,
             knowledgeItemId = connectedNoteId,
             collection = noteTag.ifBlank { noteTitle.ifBlank { "General" } },
+            sourceNoteTitle = noteTitle.ifBlank { "Untitled note" },
             question = question,
             answer = answer,
             difficulty = difficulty.ifBlank { "Unspecified" },

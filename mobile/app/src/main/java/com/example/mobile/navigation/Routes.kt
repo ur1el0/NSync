@@ -13,7 +13,7 @@ object Routes {
     const val NEW_FLASHCARD = "new_flashcard/{noteId}"
     const val FLASHCARD_DETAIL = "flashcard_detail/{cardId}"
     const val EDIT_FLASHCARD = "edit_flashcard/{cardId}"
-    const val REVIEW_SESSION_CARD = "review_session/{cardId}"
+    const val REVIEW_SESSION_NOTE = "review_session/note/{noteId}"
     const val REVIEW_CARDS = "review_cards"
     const val REVIEW_SESSION = "review_session"
     const val SESSION_COMPLETE = "session_complete"
@@ -30,7 +30,7 @@ object Routes {
 
     fun editFlashcard(cardId: Int): String = "edit_flashcard/$cardId"
 
-    fun reviewSession(cardId: Int): String = "review_session/$cardId"
+    fun reviewSessionForNote(noteId: Int): String = "review_session/note/$noteId"
 }
 
 data class BottomNavRoute(

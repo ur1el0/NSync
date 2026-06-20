@@ -30,17 +30,17 @@ class ReviewSessionViewModel : ViewModel() {
     val hasNextCard: Boolean
         get() = currentIndex < cards.lastIndex
 
-    fun loadSession(cardId: Int? = null) {
+    fun loadSession(noteId: Int? = null, cardId: Int? = null) {
         viewModelScope.launch {
             isLoading = true
             error = null
             currentIndex = 0
             try {
                 val reviewCards = repository.getReviewCards()
-                cards = if (cardId == null) {
-                    reviewCards
-                } else {
-                    reviewCards.filter { it.id == cardId }
+                cards = when {
+                    noteId != null -> reviewCards.filter { it.knowledgeItemId == noteId }
+                    cardId != null -> reviewCards.filter { it.id == cardId }
+                    else -> reviewCards
                 }
             } catch (e: Exception) {
                 cards = emptyList()

@@ -33,7 +33,8 @@ class ReviewCardsViewModel : ViewModel() {
             try {
                 cards = repository.getReviewCards()
             } catch (e: Exception) {
-                error = e.message
+                cards = emptyList()
+                error = e.message ?: "Could not load review cards."
             } finally {
                 isLoading = false
             }
