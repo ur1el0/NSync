@@ -25,6 +25,9 @@ class NoteSerializer(serializers.ModelSerializer):
 
 
 class FlashcardSerializer(serializers.ModelSerializer):
+    note_title = serializers.CharField(source='connected_note.title', read_only=True)
+    note_tag = serializers.CharField(source='connected_note.tag', read_only=True)
+
     class Meta:
         model = Flashcard
         fields = [
@@ -32,9 +35,12 @@ class FlashcardSerializer(serializers.ModelSerializer):
             'connected_note',
             'question',
             'answer',
+            'note_title',
+            'note_tag',
             'difficulty',
             'mastery_level',
         ]
+        
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
     class Meta:
