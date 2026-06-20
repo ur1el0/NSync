@@ -1,10 +1,14 @@
 package com.example.mobile.data.repository
 
 import com.example.mobile.data.KnowledgeItem
+import com.example.mobile.data.ReviewCard
 import com.example.mobile.data.remote.RetrofitClient
 import com.example.mobile.data.remote.dto.CreateNoteRequestDto
+import com.example.mobile.data.remote.dto.CreateFlashcardRequestDto
 import com.example.mobile.data.remote.dto.NoteDto
 import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
+import com.example.mobile.data.remote.dto.UpdateFlashcardRequestDto
+import com.example.mobile.data.remote.dto.FlashcardDto
 
 class NSyncRepository {
     private val apiService = RetrofitClient.apiService
@@ -88,5 +92,99 @@ class NSyncRepository {
             masteryPercent = 0,
             xpEarned = 0
         )
+    }
+
+
+    suspend fun getReviewCards(): List<ReviewCard> {
+        return try {
+            val response = apiService.getFlashcards()
+            if (!response.isSuccessful) return emptyList()
+
+            response.body().orEmpty().map { flashcard ->
+                flashcard.toReviewCard()
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun createFlashcard(
+        noteId: Int,
+        question: String,
+        answer: String,
+        difficulty: String
+    ): ReviewCard? {
+        val request = CreateFlashcardRequestDto(
+            noteId = noteId,
+            question = question,
+            answer = answer,
+            difficulty = difficulty
+        )
+        val response = apiService.createFlashcard(request)
+        return if (response.isSuccessful) {
+            response.body()?.toReviewCard()
+        } else {
+            null
+        }
+    }
+
+    suspend fun getReviewCardById(id: Int): ReviewCard? {
+        val response = apiService.getFlashcardById(id)
+        return if (response.isSuccessful) response.body()?.toReviewCard() else null
+    }
+
+    suspend fun updateFlashcard(
+        id: Int,
+        noteId: Int,
+        question: String,
+        answer: String,
+        difficulty: String,
+        masteryLevel: Int
+    ): ReviewCard? {
+        val request = UpdateFlashcardRequestDto(
+            noteId = noteId,
+            question = question,
+            answer = answer,
+            difficulty = difficulty,
+            masteryLevel = masteryLevel
+        )
+        val response = apiService.updateFlashcard(id, request)
+        return if (response.isSuccessful) response.body()?.toReviewCard() else null
+    }
+
+    suspend fun deleteFlashcard(id: Int): Boolean {
+        return apiService.deleteFlashcard(id).isSuccessful
+    }
+
+    private fun FlashcardDto.toReviewCard(): ReviewCard {
+        return ReviewCard(
+            id = id,
+            knowledgeItemId = connectedNoteId,
+            collection = noteTag.ifBlank { noteTitle.ifBlank { "General" } },
+            question = question,
+            answer = answer,
+            difficulty = difficulty.ifBlank { "Unspecified" },
+            masteryLabel = masteryLabel(masteryLevel),
+            masteryPercent = masteryPercent(masteryLevel),
+            updatedLabel = "From knowledge base"
+        )
+    }
+
+    private fun masteryLabel(level: Int): String {
+        return when (level) {
+            3 -> "Mastered"
+            2 -> "Familiar"
+            1 -> "Learning"
+            else -> "New"
+        }
+    }
+
+    private fun masteryPercent(level: Int): Int {
+        return when (level) {
+            3 -> 100
+            2 -> 66
+            1 -> 33
+            else -> 0
+        }
     }
 }
