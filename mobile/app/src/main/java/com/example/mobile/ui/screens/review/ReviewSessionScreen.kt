@@ -1,13 +1,17 @@
 package com.example.mobile.ui.screens.review
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +37,7 @@ import com.example.mobile.ui.viewmodel.ReviewSessionViewModel
 
 @Composable
 fun ReviewSessionScreen(
-    onCompleteClick: () -> Unit,
+    onCompleteClick: (score: Int, totalQuestions: Int, xpEarned: Int) -> Unit,
     noteId: Int? = null,
     cardId: Int? = null,
     viewModel: ReviewSessionViewModel = viewModel()
@@ -54,7 +58,7 @@ fun ReviewSessionScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
-            Text("+25 XP", color = NSyncBlue, style = ScreenSectionStyle)
+            Text("+${viewModel.cards.size * 25} XP", color = NSyncBlue, style = ScreenSectionStyle)
             Text(
                 text = when {
                     viewModel.isLoading -> "Loading review cards"
@@ -90,43 +94,53 @@ fun ReviewSessionScreen(
                         style = ScreenHeroStyle,
                         textAlign = TextAlign.Center
                     )
-                    Text(
-                        text = if (showAnswer) "Rate your recall" else "Tap to reveal the answer",
-                        color = NSyncMutedText,
-                        style = ScreenBodyStyle,
-                        textAlign = TextAlign.Center
-                    )
                 }
             }
             }
 
-            item {
-                PrimaryScreenButton(
-                    text = if (showAnswer) {
-                        "Continue"
-                    } else {
-                        "Show Answer"
-                    },
-                    onClick = {
-                        when {
-                            !showAnswer -> showAnswer = true
-                            viewModel.hasNextCard -> viewModel.nextCard()
-                            else -> onCompleteClick()
+            if (!showAnswer) {
+                item {
+                    PrimaryScreenButton(
+                        text = "Show Answer",
+                        onClick = { showAnswer = true }
+                    )
+                }
+            } else {
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                viewModel.recordAnswer(recalled = false)?.let { result ->
+                                    onCompleteClick(
+                                        result.score,
+                                        result.totalQuestions,
+                                        result.xpEarned
+                                    )
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Review again", style = ScreenBodyStyle)
+                        }
+                        Button(
+                            onClick = {
+                                viewModel.recordAnswer(recalled = true)?.let { result ->
+                                    onCompleteClick(
+                                        result.score,
+                                        result.totalQuestions,
+                                        result.xpEarned
+                                    )
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue)
+                        ) {
+                            Text("Got it", style = ScreenBodyStyle)
                         }
                     }
-                )
-            }
-
-            if (viewModel.hasNextCard) {
-                item {
-                    Text(
-                    text = "Skip card",
-                    color = NSyncBlue,
-                    style = ScreenBodyStyle,
-                    modifier = Modifier
-                        .padding(top = 2.dp)
-                        .clickable { viewModel.nextCard() }
-                )
                 }
             }
         } ?: item {

@@ -4,6 +4,8 @@ import com.example.mobile.data.remote.dto.CreateNoteRequestDto
 import com.example.mobile.data.remote.dto.CreateFlashcardRequestDto
 import com.example.mobile.data.remote.dto.FlashcardDto
 import com.example.mobile.data.remote.dto.NoteDto
+import com.example.mobile.data.remote.dto.ReviewCompleteRequestDto
+import com.example.mobile.data.remote.dto.ReviewCompleteResponseDto
 import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
 import com.example.mobile.data.remote.dto.UpdateFlashcardRequestDto
 import retrofit2.Response
@@ -58,4 +60,9 @@ interface ApiService {
 
     @DELETE("/api/flashcards/{id}/")
     suspend fun deleteFlashcard(@Path("id") id: Int): Response<Unit>
+
+    @POST("/api/review/complete/")
+    suspend fun completeReview(
+        @Body review: ReviewCompleteRequestDto
+    ): Response<ReviewCompleteResponseDto>
 }

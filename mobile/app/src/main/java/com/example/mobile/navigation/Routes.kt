@@ -16,7 +16,7 @@ object Routes {
     const val REVIEW_SESSION_NOTE = "review_session/note/{noteId}"
     const val REVIEW_CARDS = "review_cards"
     const val REVIEW_SESSION = "review_session"
-    const val SESSION_COMPLETE = "session_complete"
+    const val SESSION_COMPLETE = "session_complete/{score}/{totalQuestions}/{xpEarned}"
     const val MASTERY = "mastery"
     const val PROFILE = "profile"
 
@@ -31,6 +31,9 @@ object Routes {
     fun editFlashcard(cardId: Int): String = "edit_flashcard/$cardId"
 
     fun reviewSessionForNote(noteId: Int): String = "review_session/note/$noteId"
+
+    fun sessionComplete(score: Int, totalQuestions: Int, xpEarned: Int): String =
+        "session_complete/$score/$totalQuestions/$xpEarned"
 }
 
 data class BottomNavRoute(

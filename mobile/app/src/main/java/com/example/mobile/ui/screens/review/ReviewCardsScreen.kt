@@ -3,9 +3,13 @@ package com.example.mobile.ui.screens.review
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import com.example.mobile.navigation.Routes
 import com.example.mobile.ui.components.MainScreenScaffold
@@ -24,6 +28,18 @@ fun ReviewCardsScreen(
     onRouteClick: (String) -> Unit,
     viewModel: ReviewCardsViewModel = viewModel()
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner, viewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadCards()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     MainScreenScaffold(
         currentRoute = Routes.REVIEW_CARDS,
         title = "Review Sessions",

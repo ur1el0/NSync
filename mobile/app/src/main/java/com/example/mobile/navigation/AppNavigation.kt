@@ -185,7 +185,11 @@ fun AppNavigation() {
 
         composable(Routes.REVIEW_SESSION) {
             ReviewSessionScreen(
-                onCompleteClick = { navController.navigate(Routes.SESSION_COMPLETE) }
+                onCompleteClick = { score, totalQuestions, xpEarned ->
+                    navController.navigate(
+                        Routes.sessionComplete(score, totalQuestions, xpEarned)
+                    )
+                }
             )
         }
 
@@ -196,7 +200,11 @@ fun AppNavigation() {
             val noteId = backStackEntry.arguments?.getInt("noteId") ?: return@composable
             ReviewSessionScreen(
                 noteId = noteId,
-                onCompleteClick = { navController.navigate(Routes.SESSION_COMPLETE) }
+                onCompleteClick = { score, totalQuestions, xpEarned ->
+                    navController.navigate(
+                        Routes.sessionComplete(score, totalQuestions, xpEarned)
+                    )
+                }
             )
         }
 
@@ -215,8 +223,21 @@ fun AppNavigation() {
             )
         }
 
-        composable(Routes.SESSION_COMPLETE) {
+        composable(
+            route = Routes.SESSION_COMPLETE,
+            arguments = listOf(
+                navArgument("score") { type = NavType.IntType },
+                navArgument("totalQuestions") { type = NavType.IntType },
+                navArgument("xpEarned") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val score = backStackEntry.arguments?.getInt("score") ?: return@composable
+            val totalQuestions = backStackEntry.arguments?.getInt("totalQuestions") ?: return@composable
+            val xpEarned = backStackEntry.arguments?.getInt("xpEarned") ?: return@composable
             SessionCompleteScreen(
+                score = score,
+                totalQuestions = totalQuestions,
+                xpEarned = xpEarned,
                 onRouteClick = navigateBottom,
                 onReviewAgainClick = { navController.navigate(Routes.REVIEW_SESSION) },
                 onDashboardClick = {

@@ -9,6 +9,12 @@ import com.example.mobile.data.ReviewCard
 import com.example.mobile.data.repository.NSyncRepository
 import kotlinx.coroutines.launch
 
+data class ReviewSessionResult(
+    val score: Int,
+    val totalQuestions: Int,
+    val xpEarned: Int
+)
+
 class ReviewSessionViewModel : ViewModel() {
     private val repository = NSyncRepository()
 
@@ -24,6 +30,9 @@ class ReviewSessionViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
         private set
 
+    var correctAnswers by mutableStateOf(0)
+        private set
+
     val currentCard: ReviewCard?
         get() = cards.getOrNull(currentIndex)
 
@@ -35,6 +44,7 @@ class ReviewSessionViewModel : ViewModel() {
             isLoading = true
             error = null
             currentIndex = 0
+            correctAnswers = 0
             try {
                 val reviewCards = repository.getReviewCards()
                 cards = when {
@@ -53,5 +63,25 @@ class ReviewSessionViewModel : ViewModel() {
 
     fun nextCard() {
         if (hasNextCard) currentIndex += 1
+    }
+
+    fun recordAnswer(recalled: Boolean): ReviewSessionResult? {
+        if (currentCard == null) return null
+        if (recalled) correctAnswers += 1
+
+        if (hasNextCard) {
+            nextCard()
+            return null
+        }
+
+        return ReviewSessionResult(
+            score = correctAnswers,
+            totalQuestions = cards.size,
+            xpEarned = cards.size * XP_PER_CARD
+        )
+    }
+
+    private companion object {
+        const val XP_PER_CARD = 25
     }
 }

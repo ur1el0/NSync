@@ -6,6 +6,8 @@ import com.example.mobile.data.remote.RetrofitClient
 import com.example.mobile.data.remote.dto.CreateNoteRequestDto
 import com.example.mobile.data.remote.dto.CreateFlashcardRequestDto
 import com.example.mobile.data.remote.dto.NoteDto
+import com.example.mobile.data.remote.dto.ReviewCompleteRequestDto
+import com.example.mobile.data.remote.dto.ReviewCompleteResponseDto
 import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
 import com.example.mobile.data.remote.dto.UpdateFlashcardRequestDto
 import com.example.mobile.data.remote.dto.FlashcardDto
@@ -152,6 +154,21 @@ class NSyncRepository {
 
     suspend fun deleteFlashcard(id: Int): Boolean {
         return apiService.deleteFlashcard(id).isSuccessful
+    }
+
+    suspend fun completeReview(
+        score: Int,
+        totalQuestions: Int,
+        xpEarned: Int
+    ): ReviewCompleteResponseDto {
+        val response = apiService.completeReview(
+            ReviewCompleteRequestDto(score, totalQuestions, xpEarned)
+        )
+        if (!response.isSuccessful) {
+            throw IllegalStateException("Unable to save review results (HTTP ${response.code()}).")
+        }
+        return response.body()
+            ?: throw IllegalStateException("The server returned no review result.")
     }
 
     private fun FlashcardDto.toReviewCard(): ReviewCard {
