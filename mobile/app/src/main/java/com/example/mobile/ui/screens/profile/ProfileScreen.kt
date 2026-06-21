@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -47,6 +48,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ProfileScreen(
     onRouteClick: (String) -> Unit,
+    onSettingsClick: () -> Unit,
     onLogoutClick: () -> Unit,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
@@ -137,6 +139,15 @@ fun ProfileScreen(
                     value = "${progress?.accuracy?.roundToInt() ?: 0}%",
                     label = "Accuracy"
                 )
+            }
+        }
+
+        item {
+            OutlinedButton(
+                onClick = onSettingsClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Settings", color = NSyncBlue, style = ScreenSectionStyle)
             }
         }
 

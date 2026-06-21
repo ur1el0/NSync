@@ -13,6 +13,7 @@ import com.example.mobile.ui.screens.knowledge.KnowledgeBaseScreen
 import com.example.mobile.ui.screens.knowledge.KnowledgeDetailScreen
 import com.example.mobile.ui.screens.knowledge.NewNoteScreen
 import com.example.mobile.ui.screens.profile.ProfileScreen
+import com.example.mobile.ui.screens.settings.SettingsScreen
 import com.example.mobile.ui.screens.progress.MasteryScreen
 import com.example.mobile.ui.screens.review.ReviewCardsScreen
 import com.example.mobile.ui.screens.review.NewFlashcardScreen
@@ -215,11 +216,19 @@ fun AppNavigation() {
         composable(Routes.PROFILE) {
             ProfileScreen(
                 onRouteClick = navigateBottom,
+                onSettingsClick = { navController.navigate(Routes.SETTINGS) },
                 onLogoutClick = {
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0)
                     }
                 }
+            )
+        }
+
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                onBackClick = { navController.popBackStack() },
+                onProfileClick = { navController.popBackStack(Routes.PROFILE, inclusive = false) }
             )
         }
 

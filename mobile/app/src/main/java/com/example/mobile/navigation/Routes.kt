@@ -19,6 +19,7 @@ object Routes {
     const val SESSION_COMPLETE = "session_complete/{score}/{totalQuestions}/{xpEarned}"
     const val MASTERY = "mastery"
     const val PROFILE = "profile"
+    const val SETTINGS = "settings"
 
     fun knowledgeDetail(noteId: Int): String = "knowledge_detail/$noteId"
 
