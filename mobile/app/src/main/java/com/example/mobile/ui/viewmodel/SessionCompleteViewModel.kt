@@ -15,14 +15,14 @@ class SessionCompleteViewModel : ViewModel() {
     var uiState by mutableStateOf(SessionCompleteUiState())
         private set
 
-    fun saveReview(score: Int, totalQuestions: Int, xpEarned: Int) {
-        if (uiState.isSaving || uiState.result != null) return
+    fun loadProgress() {
+        if (uiState.isLoading) return
 
         viewModelScope.launch {
-            uiState = uiState.copy(isSaving = true, error = null)
+            uiState = SessionCompleteUiState(isLoading = true)
             try {
                 uiState = SessionCompleteUiState(
-                    result = repository.completeReview(score, totalQuestions, xpEarned)
+                    progress = repository.getProgress()
                 )
             } catch (e: Exception) {
                 uiState = SessionCompleteUiState(

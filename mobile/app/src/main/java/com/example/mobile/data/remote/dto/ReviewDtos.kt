@@ -3,9 +3,12 @@ package com.example.mobile.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 data class ReviewCompleteRequestDto(
-    @SerializedName("score") val score: Int,
-    @SerializedName("total_questions") val totalQuestions: Int,
-    @SerializedName("xp_earned") val xpEarned: Int
+    @SerializedName("answers") val answers: List<ReviewAnswerDto>
+)
+
+data class ReviewAnswerDto(
+    @SerializedName("flashcard_id") val flashcardId: Int,
+    @SerializedName("recalled") val recalled: Boolean
 )
 
 data class QuizAttemptDto(

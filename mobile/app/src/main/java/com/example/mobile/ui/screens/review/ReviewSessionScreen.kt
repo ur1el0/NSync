@@ -43,6 +43,12 @@ fun ReviewSessionScreen(
     viewModel: ReviewSessionViewModel = viewModel()
 ) {
     LaunchedEffect(noteId, cardId) { viewModel.loadSession(noteId, cardId) }
+    LaunchedEffect(viewModel.completedResult) {
+        viewModel.completedResult?.let { result ->
+            viewModel.consumeCompletedResult()
+            onCompleteClick(result.score, result.totalQuestions, result.xpEarned)
+        }
+    }
     var showAnswer by remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel.currentIndex) {
@@ -112,33 +118,22 @@ fun ReviewSessionScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         OutlinedButton(
-                            onClick = {
-                                viewModel.recordAnswer(recalled = false)?.let { result ->
-                                    onCompleteClick(
-                                        result.score,
-                                        result.totalQuestions,
-                                        result.xpEarned
-                                    )
-                                }
-                            },
-                            modifier = Modifier.weight(1f)
+                            onClick = { viewModel.recordAnswer(recalled = false) },
+                            modifier = Modifier.weight(1f),
+                            enabled = !viewModel.isCompleting
                         ) {
                             Text("Review again", style = ScreenBodyStyle)
                         }
                         Button(
-                            onClick = {
-                                viewModel.recordAnswer(recalled = true)?.let { result ->
-                                    onCompleteClick(
-                                        result.score,
-                                        result.totalQuestions,
-                                        result.xpEarned
-                                    )
-                                }
-                            },
+                            onClick = { viewModel.recordAnswer(recalled = true) },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue)
+                            colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue),
+                            enabled = !viewModel.isCompleting
                         ) {
-                            Text("Got it", style = ScreenBodyStyle)
+                            Text(
+                                if (viewModel.isCompleting) "Saving..." else "Got it",
+                                style = ScreenBodyStyle
+                            )
                         }
                     }
                 }

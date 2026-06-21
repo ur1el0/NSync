@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.mobile.navigation.Routes
 import com.example.mobile.ui.components.MainScreenScaffold
 import com.example.mobile.ui.components.ProgressSummaryCard
@@ -17,11 +21,25 @@ import com.example.mobile.ui.theme.NSyncMutedText
 import com.example.mobile.ui.theme.ScreenBodyStyle
 
 @Composable
-fun MasteryScreen(onRouteClick: (String) -> Unit) {
-    val uiState = viewModel<MasteryViewModel>().uiState
+fun MasteryScreen(
+    onRouteClick: (String) -> Unit,
+    masteryViewModel: MasteryViewModel = viewModel()
+) {
+    val uiState = masteryViewModel.uiState
     val progress = uiState.progress
     val totalXp = progress?.totalXp ?: 0
     val totalReviews = progress?.totalReviews ?: 0
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner, masteryViewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                masteryViewModel.loadMastery()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     MainScreenScaffold(
         currentRoute = Routes.MASTERY,

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobile.data.ReviewCard
 import com.example.mobile.data.repository.NSyncRepository
+import com.example.mobile.data.remote.dto.ReviewAnswerDto
 import kotlinx.coroutines.launch
 
 data class ReviewSessionResult(
@@ -33,6 +34,14 @@ class ReviewSessionViewModel : ViewModel() {
     var correctAnswers by mutableStateOf(0)
         private set
 
+    var isCompleting by mutableStateOf(false)
+        private set
+
+    var completedResult by mutableStateOf<ReviewSessionResult?>(null)
+        private set
+
+    private val answers = mutableListOf<ReviewAnswerDto>()
+
     val currentCard: ReviewCard?
         get() = cards.getOrNull(currentIndex)
 
@@ -45,6 +54,9 @@ class ReviewSessionViewModel : ViewModel() {
             error = null
             currentIndex = 0
             correctAnswers = 0
+            completedResult = null
+            isCompleting = false
+            answers.clear()
             try {
                 val reviewCards = repository.getReviewCards()
                 cards = when {
@@ -65,23 +77,41 @@ class ReviewSessionViewModel : ViewModel() {
         if (hasNextCard) currentIndex += 1
     }
 
-    fun recordAnswer(recalled: Boolean): ReviewSessionResult? {
-        if (currentCard == null) return null
+    fun recordAnswer(recalled: Boolean) {
+        val card = currentCard ?: return
+        if (isCompleting) return
+
+        answers += ReviewAnswerDto(flashcardId = card.id, recalled = recalled)
         if (recalled) correctAnswers += 1
 
         if (hasNextCard) {
             nextCard()
-            return null
+            return
         }
 
-        return ReviewSessionResult(
-            score = correctAnswers,
-            totalQuestions = cards.size,
-            xpEarned = cards.size * XP_PER_CARD
-        )
+        completeSession()
     }
 
-    private companion object {
-        const val XP_PER_CARD = 25
+    fun consumeCompletedResult() {
+        completedResult = null
+    }
+
+    private fun completeSession() {
+        viewModelScope.launch {
+            isCompleting = true
+            error = null
+            try {
+                val response = repository.completeReview(answers.toList())
+                completedResult = ReviewSessionResult(
+                    score = response.attempt.score,
+                    totalQuestions = response.attempt.totalQuestions,
+                    xpEarned = response.attempt.xpEarned
+                )
+            } catch (e: Exception) {
+                error = e.message ?: "Unable to save review results."
+            } finally {
+                isCompleting = false
+            }
+        }
     }
 }

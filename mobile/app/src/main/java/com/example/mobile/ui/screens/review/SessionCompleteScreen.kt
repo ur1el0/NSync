@@ -60,15 +60,13 @@ fun SessionCompleteScreen(
     onRouteClick: (String) -> Unit,
     viewModel: SessionCompleteViewModel = viewModel()
 ) {
-    LaunchedEffect(score, totalQuestions, xpEarned) {
-        viewModel.saveReview(score, totalQuestions, xpEarned)
+    LaunchedEffect(Unit) {
+        viewModel.loadProgress()
     }
 
-    val result = viewModel.uiState.result
-    val savedAttempt = result?.attempt
-    val progress = result?.progress
-    val displayedScore = savedAttempt?.score ?: score
-    val displayedTotal = savedAttempt?.totalQuestions ?: totalQuestions
+    val progress = viewModel.uiState.progress
+    val displayedScore = score
+    val displayedTotal = totalQuestions
     val accuracyPercent = progress?.accuracy?.roundToInt()
         ?: if (totalQuestions == 0) 0 else (score * 100 / totalQuestions)
 
@@ -123,14 +121,14 @@ fun SessionCompleteScreen(
                 textAlign = TextAlign.Center
             )
 
-            if (viewModel.uiState.isSaving) {
-                Text("Saving review results...", color = NSyncMutedText, style = SessionBodyStyle)
+            if (viewModel.uiState.isLoading) {
+                Text("Loading updated progress...", color = NSyncMutedText, style = SessionBodyStyle)
             }
 
             viewModel.uiState.error?.let { message ->
                 Text(message, color = Color(0xFFD21F2B), style = SessionBodyStyle)
                 OutlinedButton(
-                    onClick = { viewModel.saveReview(score, totalQuestions, xpEarned) }
+                    onClick = { viewModel.loadProgress() }
                 ) {
                     Text("Retry", style = SessionOutlineButtonStyle)
                 }
@@ -144,7 +142,7 @@ fun SessionCompleteScreen(
                 SessionMetricCard("Accuracy", "$accuracyPercent%", Modifier.weight(1f))
             }
 
-            XpEarnedCard(xpEarned = savedAttempt?.xpEarned ?: xpEarned)
+            XpEarnedCard(xpEarned = xpEarned)
 
             StreakCard(streakDays = progress?.streak ?: 0)
 
