@@ -80,7 +80,7 @@ fun AppNavigation() {
 
         composable(Routes.DASHBOARD) {
             DashboardScreen(
-                onStartReviewClick = { navController.navigate(Routes.REVIEW_SESSION) },
+                onStartReviewClick = { navController.navigate(Routes.REVIEW_CARDS) },
                 onKnowledgeClick = { item -> navController.navigate(Routes.knowledgeDetail(item.id)) },
                 onAddClick = { navController.navigate(Routes.REVIEW_CARDS) },
                 onRouteClick = navigateBottom

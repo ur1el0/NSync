@@ -11,6 +11,7 @@ import com.example.mobile.data.remote.dto.ReviewCompleteResponseDto
 import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
 import com.example.mobile.data.remote.dto.UpdateFlashcardRequestDto
 import com.example.mobile.data.remote.dto.FlashcardDto
+import com.example.mobile.data.remote.dto.UserProgressDto
 
 class NSyncRepository {
     private val apiService = RetrofitClient.apiService
@@ -202,5 +203,14 @@ class NSyncRepository {
             1 -> 33
             else -> 0
         }
+    }
+
+    suspend fun getProgress(): UserProgressDto {
+        val response = apiService.getProgress()
+        if (!response.isSuccessful) {
+            throw IllegalStateException("Unable to load progress (HTTP ${response.code()}).")
+        }
+        return response.body()
+            ?: throw IllegalStateException("The server returned no progress data.")
     }
 }

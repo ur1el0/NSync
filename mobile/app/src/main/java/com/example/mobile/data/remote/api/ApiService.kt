@@ -8,6 +8,7 @@ import com.example.mobile.data.remote.dto.ReviewCompleteRequestDto
 import com.example.mobile.data.remote.dto.ReviewCompleteResponseDto
 import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
 import com.example.mobile.data.remote.dto.UpdateFlashcardRequestDto
+import com.example.mobile.data.remote.dto.UserProgressDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -65,4 +66,9 @@ interface ApiService {
     suspend fun completeReview(
         @Body review: ReviewCompleteRequestDto
     ): Response<ReviewCompleteResponseDto>
+
+    @GET("/api/progress/")
+    suspend fun getProgress(): Response<UserProgressDto>
+
+
 }
