@@ -34,7 +34,8 @@ data class ReviewCard(
     val difficulty: String,
     val masteryLabel: String,
     val masteryPercent: Int,
-    val updatedLabel: String
+    val updatedLabel: String,
+    val sourceNoteTitle: String = collection
 )
 
 data class CollectionMastery(
