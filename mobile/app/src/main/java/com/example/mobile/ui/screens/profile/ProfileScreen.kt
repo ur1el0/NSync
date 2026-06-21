@@ -18,12 +18,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile.R
 import com.example.mobile.data.SampleData
 import com.example.mobile.navigation.Routes
@@ -36,13 +41,31 @@ import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncCardWhite
 import com.example.mobile.ui.theme.NSyncMutedText
 import com.example.mobile.ui.theme.NSyncRed
+import com.example.mobile.ui.viewmodel.ProfileViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun ProfileScreen(
     onRouteClick: (String) -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
     val user = SampleData.userProfile
+    val uiState = profileViewModel.uiState
+    val progress = uiState.progress
+    val totalXp = progress?.totalXp ?: 0
+    val totalReviews = progress?.totalReviews ?: 0
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner, profileViewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                profileViewModel.loadProfile()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     MainScreenScaffold(
         currentRoute = Routes.PROFILE,
@@ -50,6 +73,20 @@ fun ProfileScreen(
         subtitle = user.learningGoal,
         onRouteClick = onRouteClick
     ) {
+        if (uiState.isLoading) {
+            item { Text("Loading profile...", color = NSyncMutedText, style = ScreenBodyStyle) }
+        }
+
+        uiState.error?.let { message ->
+            item {
+                Text(
+                    "Unable to load profile: $message",
+                    color = NSyncRed,
+                    style = ScreenBodyStyle
+                )
+            }
+        }
+
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -74,7 +111,12 @@ fun ProfileScreen(
                     Text(user.name, color = Color(0xFF151927), style = ScreenSectionStyle)
                     Text(user.email, color = NSyncMutedText, style = ScreenBodyStyle)
                     Text(user.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
-                    Text("LVL ${user.level}", color = NSyncBlue, style = ScreenSectionStyle)
+                    Text("LVL ${progress?.level ?: 1}", color = NSyncBlue, style = ScreenSectionStyle)
+                    Text(
+                        "$totalXp XP - $totalReviews cards reviewed",
+                        color = NSyncMutedText,
+                        style = ScreenBodyStyle
+                    )
                 }
             }
         }
@@ -85,14 +127,14 @@ fun ProfileScreen(
                     modifier = Modifier.weight(1f),
                     icon = R.drawable.ic_wind,
                     iconTint = NSyncRed,
-                    value = user.streakDays.toString(),
+                    value = (progress?.streak ?: 0).toString(),
                     label = "Day streak"
                 )
                 ProfileStatCard(
                     modifier = Modifier.weight(1f),
                     icon = R.drawable.ic_target,
                     iconTint = NSyncBlue,
-                    value = "${user.accuracyPercent}%",
+                    value = "${progress?.accuracy?.roundToInt() ?: 0}%",
                     label = "Accuracy"
                 )
             }
