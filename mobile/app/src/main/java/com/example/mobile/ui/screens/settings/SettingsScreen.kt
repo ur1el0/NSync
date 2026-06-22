@@ -1,9 +1,12 @@
 package com.example.mobile.ui.screens.settings
 
-import android.content.Context
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,10 +17,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +35,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.example.mobile.R
+import com.example.mobile.notifications.ReviewReminderScheduler
 import com.example.mobile.data.SampleData
+import com.example.mobile.ui.components.SettingsDivider
+import com.example.mobile.ui.components.SettingsDropdownRow
+import com.example.mobile.ui.components.SettingsRow
+import com.example.mobile.ui.components.SettingsSection
+import com.example.mobile.ui.components.SettingsToggleRow
 import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncCardWhite
 import com.example.mobile.ui.theme.NSyncLightBackground
@@ -39,34 +57,51 @@ import com.example.mobile.ui.theme.ScreenBodyStyle
 import com.example.mobile.ui.theme.ScreenCardBorder
 import com.example.mobile.ui.theme.ScreenSectionStyle
 
-private const val SETTINGS_PREFERENCES = "nsync_settings"
-
 @Composable
 fun SettingsScreen(
     onBackClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val preferences = remember(context) {
-        context.getSharedPreferences(SETTINGS_PREFERENCES, Context.MODE_PRIVATE)
-    }
+    val preferences = remember(context) { SettingsPreferences.from(context) }
     val user = SampleData.userProfile
     val goals = listOf(10, 20, 30, 50, 100)
     val reminderTimes = listOf("8:00 AM", "12:00 PM", "6:00 PM")
     val difficulties = listOf("Adaptive", "Easy", "Medium", "Hard")
 
-    var dailyGoal by rememberSaveable { mutableIntStateOf(preferences.getInt("daily_goal", 50)) }
+    var dailyGoal by rememberSaveable {
+        mutableIntStateOf(preferences.getInt(SettingsPreferences.DAILY_GOAL, 50))
+    }
     var reminderTime by rememberSaveable {
-        mutableStateOf(preferences.getString("reminder_time", "8:00 AM") ?: "8:00 AM")
+        mutableStateOf(preferences.getString(SettingsPreferences.REMINDER_TIME, "8:00 AM") ?: "8:00 AM")
     }
     var difficulty by rememberSaveable {
-        mutableStateOf(preferences.getString("review_difficulty", "Adaptive") ?: "Adaptive")
+        mutableStateOf(preferences.getString(SettingsPreferences.REVIEW_DIFFICULTY, "Adaptive") ?: "Adaptive")
     }
     var streakReminders by rememberSaveable {
-        mutableStateOf(preferences.getBoolean("streak_reminders", true))
+        mutableStateOf(preferences.getBoolean(SettingsPreferences.STREAK_REMINDERS, true))
     }
     var notificationsEnabled by rememberSaveable {
-        mutableStateOf(preferences.getBoolean("notifications_enabled", true))
+        mutableStateOf(preferences.getBoolean(SettingsPreferences.NOTIFICATIONS_ENABLED, true))
+    }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        notificationsEnabled = granted
+        preferences.edit().putBoolean(SettingsPreferences.NOTIFICATIONS_ENABLED, granted).apply()
+        if (granted) ReviewReminderScheduler.schedule(context) else ReviewReminderScheduler.cancel(context)
+    }
+
+    LaunchedEffect(notificationsEnabled) {
+        val hasNotificationPermission =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+        if (notificationsEnabled && hasNotificationPermission) {
+            ReviewReminderScheduler.schedule(context)
+        }
     }
 
     Column(
@@ -80,48 +115,63 @@ fun SettingsScreen(
         SettingsTopBar(onBackClick)
 
         SettingsSection(title = "ACCOUNT") {
-            SettingsRow(label = "Profile", value = ">", onClick = onProfileClick)
+            SettingsRow(
+                label = "Profile",
+                iconRes = R.drawable.ic_profile,
+                onClick = onProfileClick,
+                showChevron = true
+            )
             SettingsDivider()
-            SettingsRow(label = "Email Address", value = user.email)
+            SettingsRow(label = "Email Address", value = user.email, iconRes = R.drawable.ic_mail_outline)
             SettingsDivider()
-            SettingsRow(label = "Change Password", value = "Unavailable")
+            SettingsRow(label = "Change Password", value = "Unavailable", iconRes = R.drawable.ic_lock_outline)
         }
 
         SettingsSection(title = "REVIEW PREFERENCES") {
-            SettingsRow(
+            SettingsDropdownRow(
                 label = "Daily Review Goal",
                 value = "$dailyGoal Cards",
+                iconRes = R.drawable.ic_target,
                 valueColor = NSyncBlue,
-                onClick = {
-                    dailyGoal = nextValue(goals, dailyGoal)
-                    preferences.edit().putInt("daily_goal", dailyGoal).apply()
+                options = goals.map { "$it Cards" },
+                onOptionSelected = { selected ->
+                    dailyGoal = selected.substringBefore(" ").toInt()
+                    preferences.edit().putInt(SettingsPreferences.DAILY_GOAL, dailyGoal).apply()
+                    if (notificationsEnabled) ReviewReminderScheduler.schedule(context)
                 }
             )
             SettingsDivider()
-            SettingsRow(
+            SettingsDropdownRow(
                 label = "Reminder Time",
                 value = reminderTime,
-                onClick = {
-                    reminderTime = nextValue(reminderTimes, reminderTime)
-                    preferences.edit().putString("reminder_time", reminderTime).apply()
+                iconRes = R.drawable.ic_note,
+                options = reminderTimes,
+                onOptionSelected = { selected ->
+                    reminderTime = selected
+                    preferences.edit().putString(SettingsPreferences.REMINDER_TIME, selected).apply()
+                    if (notificationsEnabled) ReviewReminderScheduler.schedule(context)
                 }
             )
             SettingsDivider()
-            SettingsRow(
+            SettingsDropdownRow(
                 label = "Review Difficulty",
                 value = difficulty,
-                onClick = {
-                    difficulty = nextValue(difficulties, difficulty)
-                    preferences.edit().putString("review_difficulty", difficulty).apply()
+                iconRes = R.drawable.ic_flashcard,
+                options = difficulties,
+                onOptionSelected = { selected ->
+                    difficulty = selected
+                    preferences.edit().putString(SettingsPreferences.REVIEW_DIFFICULTY, selected).apply()
                 }
             )
             SettingsDivider()
             SettingsToggleRow(
                 label = "Streak Reminders",
+                iconRes = R.drawable.ic_wind,
                 checked = streakReminders,
                 onCheckedChange = {
                     streakReminders = it
-                    preferences.edit().putBoolean("streak_reminders", it).apply()
+                    preferences.edit().putBoolean(SettingsPreferences.STREAK_REMINDERS, it).apply()
+                    if (notificationsEnabled) ReviewReminderScheduler.schedule(context)
                 }
             )
         }
@@ -129,14 +179,30 @@ fun SettingsScreen(
         SettingsSection(title = "APP PREFERENCES") {
             SettingsToggleRow(
                 label = "Notifications",
+                iconRes = R.drawable.ic_note,
                 checked = notificationsEnabled,
                 onCheckedChange = {
-                    notificationsEnabled = it
-                    preferences.edit().putBoolean("notifications_enabled", it).apply()
+                    if (!it) {
+                        notificationsEnabled = false
+                        preferences.edit().putBoolean(SettingsPreferences.NOTIFICATIONS_ENABLED, false).apply()
+                        ReviewReminderScheduler.cancel(context)
+                    } else if (
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        notificationsEnabled = true
+                        preferences.edit().putBoolean(SettingsPreferences.NOTIFICATIONS_ENABLED, true).apply()
+                        ReviewReminderScheduler.schedule(context)
+                    }
                 }
             )
             SettingsDivider()
-            SettingsRow(label = "Appearance", value = "System")
+            SettingsRow(label = "Appearance", value = "System", iconRes = R.drawable.ic_profile)
         }
     }
 }
@@ -144,88 +210,17 @@ fun SettingsScreen(
 @Composable
 private fun SettingsTopBar(onBackClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .padding(top = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "<",
-            color = NSyncMutedText,
-            style = ScreenSectionStyle,
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_back),
+            contentDescription = "Back",
             modifier = Modifier.clickable(onClick = onBackClick)
         )
         Text("NSync", color = NSyncBlue, style = ScreenSectionStyle)
         Text(" ", style = ScreenSectionStyle)
     }
-}
-
-@Composable
-private fun SettingsSection(
-    title: String,
-    content: @Composable () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(
-            text = title,
-            color = Color(0xFF3D4556),
-            style = ScreenBodyStyle,
-            fontWeight = FontWeight.SemiBold
-        )
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = NSyncCardWhite),
-            shape = RoundedCornerShape(14.dp),
-            border = ScreenCardBorder
-        ) {
-            Column(content = { content() })
-        }
-    }
-}
-
-@Composable
-private fun SettingsRow(
-    label: String,
-    value: String,
-    valueColor: Color = NSyncMutedText,
-    onClick: (() -> Unit)? = null
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 18.dp, vertical = 18.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(label, color = Color(0xFF202431), style = ScreenSectionStyle)
-        Text(value, color = valueColor, style = ScreenBodyStyle)
-    }
-}
-
-@Composable
-private fun SettingsToggleRow(
-    label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 18.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(label, color = Color(0xFF202431), style = ScreenSectionStyle)
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
-    }
-}
-
-@Composable
-private fun SettingsDivider() {
-    HorizontalDivider(color = Color(0xFFE0E4ED))
-}
-
-private fun <T> nextValue(values: List<T>, current: T): T {
-    val currentIndex = values.indexOf(current)
-    return values[(currentIndex + 1).mod(values.size)]
 }
