@@ -59,3 +59,13 @@ data class ReviewSessionSummary(
     val levelLabel: String,
     val xpToNextLevel: Int
 )
+
+data class LoginRequest(
+    val email: String,
+    val name: String // Backend User model only has name and email for now
+)
+
+data class RegisterRequest(
+    val email: String,
+    val name: String
+)
