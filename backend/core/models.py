@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
     
@@ -7,6 +8,13 @@ class User(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField(blank=True)
 
+class UserProfile(models.Model):
+    user =  models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
+    display_name = models.CharField(max_length=200)
 
 class Note(models.Model):
     title = models.CharField(max_length=200)

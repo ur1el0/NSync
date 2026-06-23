@@ -1,0 +1,81 @@
+### Health check
+GET http://127.0.0.1:8000/api/health/
+
+### Get notes
+GET http://127.0.0.1:8000/api/notes/
+
+### Get flashcards
+GET http://127.0.0.1:8000/api/flashcards/
+
+### Get progress
+GET http://127.0.0.1:8000/api/progress/
+
+### Complete review
+POST http://127.0.0.1:8000/api/review/complete/
+Content-Type: application/json
+
+{
+  "score": 4,
+  "total_questions": 5,
+  "xp_earned": 125
+}
+
+### New Note
+POST http://127.0.0.1:8000/api/notes/
+Content-Type: application/json
+
+{
+    "title": "Django REST Framework",
+    "content": "DRF helps Django expose data through API endpoints.",
+    "tag": "Programming"
+}
+
+### Register a new user
+POST http://127.0.0.1:8000/api/auth/register/
+Content-Type: application/json
+
+{
+  "display_name": "Ro",
+  "email": "ro@example.com",
+  "password": "securedpass123"
+}
+
+
+### Login the user created above
+POST http://127.0.0.1:8000/api/auth/login/
+Content-Type: application/json
+
+{
+  "email": "ro@example.com",
+  "password": "securedpass123"
+}
+
+### Test login with wrong credentials
+POST http://127.0.0.1:8000/api/auth/login/
+Content-Type: application/json
+
+{
+  "email": "ro@example.com",
+  "password": "wrongpassword"
+}
+
+### Test current user
+GET http://127.0.0.1:8000/api/auth/me/
+Authorization: Bearer replace-access_token-with-the-access-token-you-received-during-login
+
+### Test refresh
+POST http://127.0.0.1:8000/api/auth/refresh/
+Content-Type: application/json
+
+{
+  "refresh": "replace-refresh_token-with-the-refresh-token-you-received-during-login"
+}
+
+### Test logout
+POST http://127.0.0.1:8000/api/auth/logout/
+Authorization: Bearer replace-access_token-with-the-access-token-you-received-during-login
+Content-Type: application/json
+
+{
+  "refresh": "replace-refresh_token-with-the-refresh-token-you-received-during-login"
+}
