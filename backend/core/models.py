@@ -17,6 +17,13 @@ class UserProfile(models.Model):
     display_name = models.CharField(max_length=200)
 
 class Note(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notes",
+        null=True,
+        blank=True,
+    )
     title = models.CharField(max_length=200)
     content = models.TextField()
     tag = models.CharField(max_length=100, blank=True)
@@ -40,12 +47,26 @@ class Flashcard(models.Model):
 
 
 class QuizAttempt(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="quiz_attempts",
+        null=True,
+        blank=True,
+    )
     score = models.IntegerField(default=0)
     total_questions = models.PositiveIntegerField(default=0)
     xp_earned = models.PositiveIntegerField(default=0)
     date_taken = models.DateTimeField(auto_now_add=True)
 
 class UserProgress(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="progress",
+        null=True,
+        blank=True,
+    )
     total_xp = models.PositiveIntegerField(default=0)
     level = models.PositiveIntegerField(default=1)
     streak = models.PositiveIntegerField(default=0)
