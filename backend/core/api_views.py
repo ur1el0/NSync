@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import PermissionDenied
 
 from .models import Note, Flashcard, QuizAttempt, UserProgress
 from .serializers import (
@@ -38,12 +39,23 @@ def health_check(request):
 class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.order_by("-updated_at")
     serializer_class = NoteSerializer
-
-class FlashcardViewSet(viewsets.ModelViewSet):
-    serializer_class = FlashcardSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Flashcard.objects.order_by("id")
+        return Note.objects.filter(owner=self.request.user).order_by("-updated_at")
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class FlashcardViewSet(viewsets.ModelViewSet):
+    queryset = Flashcard.objects.all()
+    serializer_class = FlashcardSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Flashcard.objects.filter(
+            connected_note__owner=self.request.user
+        ).order_by("id")
         note_id = self.request.query_params.get("note")
 
         if note_id:
@@ -51,26 +63,39 @@ class FlashcardViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    def perform_create(self, serializer):
+        connected_note = serializer.validated_data["connected_note"]
+
+        if connected_note.owner != self.request.user:
+            raise PermissionDenied(
+                "You do not have permission to add flashcards to this note."
+            )
+
+        serializer.save()
+
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def progress_detail(request):
-    progress, created = UserProgress.objects.get_or_create(id=1)
+    progress, created = UserProgress.objects.get_or_create(user=request.user)
     serializer = UserProgressSerializer(progress)
     return Response(serializer.data)
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def complete_review(request):
     score = int(request.data.get("score", 0))
     total_questions = int(request.data.get("total_questions", 0))
     xp_earned = int(request.data.get("xp_earned", 0))
 
     attempt = QuizAttempt.objects.create(
+        user=request.user,
         score=score,
         total_questions=total_questions,
         xp_earned=xp_earned,
     )
 
-    progress, created = UserProgress.objects.get_or_create(id=1)
+    progress, created = UserProgress.objects.get_or_create(user=request.user)
 
     progress.total_xp += xp_earned
     progress.total_reviews += total_questions
