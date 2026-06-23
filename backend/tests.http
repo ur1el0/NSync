@@ -1,81 +1,97 @@
+@baseUrl = http://127.0.0.1:8000/api
+@userAAccessToken = replace-with-user-a-access-token
+@userARefreshToken = replace-with-user-a-refresh-token
+@userBAccessToken = replace-with-user-b-access-token
+@userANoteId = replace-with-user-a-note-id
+
 ### Health check
-GET http://127.0.0.1:8000/api/health/
+GET {{baseUrl}}/health/
 
-### Get notes
-GET http://127.0.0.1:8000/api/notes/
-
-### Get flashcards
-GET http://127.0.0.1:8000/api/flashcards/
-
-### Get progress
-GET http://127.0.0.1:8000/api/progress/
-
-### Complete review
-POST http://127.0.0.1:8000/api/review/complete/
+### Register User A
+POST {{baseUrl}}/auth/register/
 Content-Type: application/json
 
 {
-  "score": 4,
-  "total_questions": 5,
-  "xp_earned": 125
+  "display_name": "User A",
+  "email": "user-a@example.com",
+  "password": "SecurePassword123"
 }
 
-### New Note
-POST http://127.0.0.1:8000/api/notes/
+### Register User B
+POST {{baseUrl}}/auth/register/
 Content-Type: application/json
 
 {
-    "title": "Django REST Framework",
-    "content": "DRF helps Django expose data through API endpoints.",
-    "tag": "Programming"
+  "display_name": "User B",
+  "email": "user-b@example.com",
+  "password": "SecurePassword123"
 }
 
-### Register a new user
-POST http://127.0.0.1:8000/api/auth/register/
+### User A creates a note
+POST {{baseUrl}}/notes/
+Authorization: Bearer {{userAAccessToken}}
 Content-Type: application/json
 
 {
-  "display_name": "Ro",
-  "email": "ro@example.com",
-  "password": "securedpass123"
+  "title": "User A private note",
+  "content": "Only User A should access this.",
+  "tag": "Testing"
 }
 
+### User B lists notes: User A's note must not appear
+GET {{baseUrl}}/notes/
+Authorization: Bearer {{userBAccessToken}}
 
-### Login the user created above
-POST http://127.0.0.1:8000/api/auth/login/
+### User B reads User A's note: expect 404
+GET {{baseUrl}}/notes/{{userANoteId}}/
+Authorization: Bearer {{userBAccessToken}}
+
+### User B creates a card in User A's note: expect 403
+POST {{baseUrl}}/flashcards/
+Authorization: Bearer {{userBAccessToken}}
 Content-Type: application/json
 
 {
-  "email": "ro@example.com",
-  "password": "securedpass123"
+  "connected_note": {{userANoteId}},
+  "question": "Should this work?",
+  "answer": "No."
 }
 
-### Test login with wrong credentials
-POST http://127.0.0.1:8000/api/auth/login/
+### User A completes a review
+POST {{baseUrl}}/review/complete/
+Authorization: Bearer {{userAAccessToken}}
 Content-Type: application/json
 
 {
-  "email": "ro@example.com",
-  "password": "wrongpassword"
+  "score": 2,
+  "total_questions": 3,
+  "xp_earned": 75
 }
 
-### Test current user
-GET http://127.0.0.1:8000/api/auth/me/
-Authorization: Bearer replace-access_token-with-the-access-token-you-received-during-login
-
-### Test refresh
-POST http://127.0.0.1:8000/api/auth/refresh/
+### User B completes a review
+POST {{baseUrl}}/review/complete/
+Authorization: Bearer {{userBAccessToken}}
 Content-Type: application/json
 
 {
-  "refresh": "replace-refresh_token-with-the-refresh-token-you-received-during-login"
+  "score": 1,
+  "total_questions": 2,
+  "xp_earned": 25
 }
 
-### Test logout
-POST http://127.0.0.1:8000/api/auth/logout/
-Authorization: Bearer replace-access_token-with-the-access-token-you-received-during-login
+### User A progress
+GET {{baseUrl}}/progress/
+Authorization: Bearer {{userAAccessToken}}
+
+### User B progress
+GET {{baseUrl}}/progress/
+Authorization: Bearer {{userBAccessToken}}
+
+### User A logs out
+POST {{baseUrl}}/auth/logout/
+Authorization: Bearer {{userAAccessToken}}
 Content-Type: application/json
 
 {
-  "refresh": "replace-refresh_token-with-the-refresh-token-you-received-during-login"
+  "refresh": "{{userARefreshToken}}"
 }
