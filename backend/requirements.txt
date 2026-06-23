@@ -9,8 +9,4 @@ packaging==26.2
 psycopg2-binary==2.9.12
 PyJWT==2.13.0
 python-dotenv==1.2.2
-<<<<<<< HEAD
 sqlparse==0.5.5
-=======
-sqlparse==0.5.5
->>>>>>> d28d551 (chore(backend): fixed backend dependencies)
