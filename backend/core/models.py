@@ -21,8 +21,6 @@ class Note(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="notes",
-        null=True,
-        blank=True,
     )
     title = models.CharField(max_length=200)
     content = models.TextField()
@@ -51,8 +49,6 @@ class QuizAttempt(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="quiz_attempts",
-        null=True,
-        blank=True,
     )
     score = models.IntegerField(default=0)
     total_questions = models.PositiveIntegerField(default=0)
@@ -60,12 +56,10 @@ class QuizAttempt(models.Model):
     date_taken = models.DateTimeField(auto_now_add=True)
 
 class UserProgress(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="progress",
-        null=True,
-        blank=True,
     )
     total_xp = models.PositiveIntegerField(default=0)
     level = models.PositiveIntegerField(default=1)
