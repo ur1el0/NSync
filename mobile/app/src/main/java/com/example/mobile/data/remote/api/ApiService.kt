@@ -9,6 +9,12 @@ import com.example.mobile.data.remote.dto.ReviewCompleteResponseDto
 import com.example.mobile.data.remote.dto.UpdateNoteRequestDto
 import com.example.mobile.data.remote.dto.UpdateFlashcardRequestDto
 import com.example.mobile.data.remote.dto.UserProgressDto
+import com.example.mobile.data.remote.dto.AuthResponseDto
+import com.example.mobile.data.remote.dto.RefreshRequestDto
+import com.example.mobile.data.remote.dto.RefreshResponseDto
+import com.example.mobile.data.remote.dto.AuthenticatedUserDto
+import com.example.mobile.data.remote.dto.LoginRequestDto
+import com.example.mobile.data.remote.dto.RegisterRequestDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -70,5 +76,18 @@ interface ApiService {
     @GET("/api/progress/")
     suspend fun getProgress(): Response<UserProgressDto>
 
+    @POST("/api/auth/register/")
+    suspend fun register(@Body registerRequest: RegisterRequestDto): Response<AuthResponseDto>
 
+    @POST("/api/auth/login/")
+    suspend fun login(@Body loginRequest: LoginRequestDto): Response<AuthResponseDto>
+
+    @POST("/api/auth/refresh/")
+    suspend fun refreshToken(@Body refreshRequest: RefreshRequestDto): Response<RefreshResponseDto>
+
+    @POST("/api/auth/logout/")
+    suspend fun logout(@Body refreshRequest: RefreshRequestDto): Response<Unit>
+
+    @GET("/api/auth/me/")
+    suspend fun getAuthenticatedUser(): Response<AuthenticatedUserDto>
 }
