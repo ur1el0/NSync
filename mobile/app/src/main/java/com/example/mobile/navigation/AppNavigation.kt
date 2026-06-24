@@ -20,10 +20,30 @@ import com.example.mobile.ui.screens.review.NewFlashcardScreen
 import com.example.mobile.ui.screens.review.FlashcardDetailScreen
 import com.example.mobile.ui.screens.review.ReviewSessionScreen
 import com.example.mobile.ui.screens.review.SessionCompleteScreen
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mobile.data.remote.RetrofitClient
+import com.example.mobile.data.repository.AuthRepository
+import com.example.mobile.ui.viewmodel.AuthViewModel
+import com.example.mobile.ui.viewmodel.AuthViewModelFactory
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val authRepository = remember { 
+        AuthRepository(RetrofitClient.sessionStore) 
+    }
+    val authViewModel: AuthViewModel = viewModel(
+        factory = remember (authRepository) {
+            AuthViewModelFactory(authRepository)
+        },
+    )
+    val authState = authViewModel.uiState
+
+    LaunchedEffect(Unit) {
+        authViewModel.restoreSession()
+    }
     val navigateBottom: (String) -> Unit = { route ->
         if (navController.currentDestination?.route != route) {
             if (route == Routes.DASHBOARD) {
@@ -45,37 +65,52 @@ fun AppNavigation() {
         }
     }
 
+    LaunchedEffect(authState.hasRestoredSession, authState.session) {
+        if (!authState.hasRestoredSession) return@LaunchedEffect
+
+        val currentRoute = navController.currentDestination?.route
+        val isAuthRoute = currentRoute == Routes.LOGIN || currentRoute == Routes.REGISTER
+
+        if (authState.session != null && isAuthRoute) {
+            navController.navigate(Routes.DASHBOARD) {
+                popUpTo(Routes.LOGIN) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        } else if (authState.session == null && !isAuthRoute) {
+            navController.navigate(Routes.LOGIN) {
+                popUpTo(0)
+                launchSingleTop = true
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = Routes.LOGIN
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginClick = { _, _ ->
-                    navController.navigate(Routes.DASHBOARD) {
-                        popUpTo(Routes.LOGIN) {
-                            inclusive = true
-                        }
-                    }
-                },
+                onLoginClick = authViewModel::login,
                 onRegisterClick = {
+                    authViewModel.clearError()
                     navController.navigate(Routes.REGISTER)
-                }
+                },
+                isLoading = authState.isLoading,
+                errorMessage = authState.errorMessage,
             )
         }
 
         composable(Routes.REGISTER) {
             RegisterScreen(
-                onRegisterClick = { _, _, _ ->
-                    navController.navigate(Routes.DASHBOARD) {
-                        popUpTo(Routes.LOGIN) {
-                            inclusive = true
-                        }
-                    }
-                },
+                onRegisterClick = authViewModel::register,
                 onLoginClick = {
+                    authViewModel.clearError()
                     navController.popBackStack()
-                }
+                },
+                isLoading = authState.isLoading,
+                errorMessage = authState.errorMessage,    
             )
         }
 
@@ -217,11 +252,7 @@ fun AppNavigation() {
             ProfileScreen(
                 onRouteClick = navigateBottom,
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
-                onLogoutClick = {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(0)
-                    }
-                }
+                onLogoutClick = authViewModel::logout
             )
         }
 
