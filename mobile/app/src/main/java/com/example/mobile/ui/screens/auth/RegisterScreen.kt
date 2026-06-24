@@ -33,13 +33,10 @@ import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncLightBackground
 import com.example.mobile.ui.theme.NSyncMutedText
 
-
 @Composable
 fun RegisterScreen(
     onRegisterClick: (String, String, String) -> Unit,
-    onLoginClick: () -> Unit,
-    isLoading: Boolean,
-    errorMessage: String?,
+    onLoginClick: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -109,11 +106,7 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(28.dp))
 
         Button(
-            onClick = { onRegisterClick(name.trim(), email.trim(), password) },
-            enabled = !isLoading &&
-                    name.isNotBlank() && 
-                    email.isNotBlank() &&
-                    password.isNotBlank(),
+            onClick = { onRegisterClick(name, email, password) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(54.dp),
@@ -121,17 +114,9 @@ fun RegisterScreen(
             colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue)
         ) {
             Text(
-                text = if (isLoading) "Creating account..." else "Create Account",
+                text = "Create Account  →",
                 color = Color.White,
                 style = RegisterButtonStyle
-            )
-        }
-
-        if (!errorMessage.isNullOrBlank()) {
-            Text(
-                text = errorMessage,
-                color = Color(0xFFB3261E),
-                modifier = Modifier.padding(top = 8.dp),
             )
         }
 

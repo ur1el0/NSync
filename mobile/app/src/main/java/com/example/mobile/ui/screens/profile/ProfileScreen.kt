@@ -10,27 +10,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile.R
 import com.example.mobile.data.SampleData
 import com.example.mobile.navigation.Routes
@@ -43,32 +36,13 @@ import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncCardWhite
 import com.example.mobile.ui.theme.NSyncMutedText
 import com.example.mobile.ui.theme.NSyncRed
-import com.example.mobile.ui.viewmodel.ProfileViewModel
-import kotlin.math.roundToInt
 
 @Composable
 fun ProfileScreen(
     onRouteClick: (String) -> Unit,
-    onSettingsClick: () -> Unit,
-    onLogoutClick: () -> Unit,
-    profileViewModel: ProfileViewModel = viewModel()
+    onLogoutClick: () -> Unit
 ) {
     val user = SampleData.userProfile
-    val uiState = profileViewModel.uiState
-    val progress = uiState.progress
-    val totalXp = progress?.totalXp ?: 0
-    val totalReviews = progress?.totalReviews ?: 0
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    DisposableEffect(lifecycleOwner, profileViewModel) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                profileViewModel.loadProfile()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
 
     MainScreenScaffold(
         currentRoute = Routes.PROFILE,
@@ -76,122 +50,64 @@ fun ProfileScreen(
         subtitle = user.learningGoal,
         onRouteClick = onRouteClick
     ) {
-        if (uiState.isLoading) {
-            item { Text("Loading profile...", color = NSyncMutedText, style = ScreenBodyStyle) }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = NSyncCardWhite),
+                shape = RoundedCornerShape(18.dp),
+                border = ScreenCardBorder
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color(0xFFE8F1FF)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(user.name.take(1), color = NSyncBlue, style = ScreenHeroStyle)
+                    }
+                    Text(user.name, color = Color(0xFF151927), style = ScreenSectionStyle)
+                    Text(user.email, color = NSyncMutedText, style = ScreenBodyStyle)
+                    Text(user.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
+                    Text("LVL ${user.level}", color = NSyncBlue, style = ScreenSectionStyle)
+                }
+            }
         }
 
-        uiState.error?.let { message ->
-            item {
-                Text(
-                    "Unable to load profile: $message",
-                    color = NSyncRed,
-                    style = ScreenBodyStyle
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ProfileStatCard(
+                    modifier = Modifier.weight(1f),
+                    icon = R.drawable.ic_wind,
+                    iconTint = NSyncRed,
+                    value = user.streakDays.toString(),
+                    label = "Day streak"
+                )
+                ProfileStatCard(
+                    modifier = Modifier.weight(1f),
+                    icon = R.drawable.ic_target,
+                    iconTint = NSyncBlue,
+                    value = "${user.accuracyPercent}%",
+                    label = "Accuracy"
                 )
             }
         }
 
         item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+            Button(
+                onClick = onLogoutClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(999.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = NSyncRed)
             ) {
-                Card(
-                    modifier = Modifier
-                        .widthIn(max = 380.dp)
-                        .fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NSyncCardWhite),
-                    shape = RoundedCornerShape(18.dp),
-                    border = ScreenCardBorder
-                ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(Color(0xFFE8F1FF)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(user.name.take(1), color = NSyncBlue, style = ScreenHeroStyle)
-                        }
-                        Text(user.name, color = Color(0xFF151927), style = ScreenSectionStyle)
-                        Text(user.email, color = NSyncMutedText, style = ScreenBodyStyle)
-                        Text(user.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
-                        Text("LVL ${progress?.level ?: 1}", color = NSyncBlue, style = ScreenSectionStyle)
-                        Text(
-                            "$totalXp XP - $totalReviews cards reviewed",
-                            color = NSyncMutedText,
-                            style = ScreenBodyStyle
-                        )
-                    }
-                }
-            }
-        }
-
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier
-                        .widthIn(max = 380.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    ProfileStatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = R.drawable.ic_wind,
-                        iconTint = NSyncRed,
-                        value = (progress?.streak ?: 0).toString(),
-                        label = "Day streak"
-                    )
-                    ProfileStatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = R.drawable.ic_target,
-                        iconTint = NSyncBlue,
-                        value = "${progress?.accuracy?.roundToInt() ?: 0}%",
-                        label = "Accuracy"
-                    )
-                }
-            }
-        }
-
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                OutlinedButton(
-                    onClick = onSettingsClick,
-                    modifier = Modifier
-                        .widthIn(max = 380.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text("Settings", color = NSyncBlue, style = ScreenSectionStyle)
-                }
-            }
-        }
-
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = onLogoutClick,
-                    modifier = Modifier
-                        .widthIn(max = 380.dp)
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(999.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = NSyncRed)
-                ) {
-                    Text("Logout", color = Color.White, style = ScreenSectionStyle)
-                }
+                Text("Logout", color = Color.White, style = ScreenSectionStyle)
             }
         }
     }

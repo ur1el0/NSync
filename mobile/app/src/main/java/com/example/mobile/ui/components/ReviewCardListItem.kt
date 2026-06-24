@@ -1,6 +1,5 @@
 package com.example.mobile.ui.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,11 +23,9 @@ import com.example.mobile.ui.theme.ScreenSmallBoldStyle
 import com.example.mobile.ui.theme.ScreenTitle
 
 @Composable
-fun ReviewCardListItem(card: ReviewCard, onClick: () -> Unit) {
+fun ReviewCardListItem(card: ReviewCard) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = NSyncCardWhite),
         shape = RoundedCornerShape(10.dp),
         border = ScreenCardBorder
