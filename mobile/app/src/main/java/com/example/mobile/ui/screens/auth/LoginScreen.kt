@@ -43,10 +43,13 @@ import com.example.mobile.ui.theme.InterFontFamily
 import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncCardWhite
 
+
 @Composable
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    isLoading: Boolean,
+    errorMessage: String?,
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -134,16 +137,17 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
-                    onClick = { onLoginClick(email, password) },
+                    onClick = { onLoginClick(email.trim(), password) },
+                    enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
                         .shadow(15.dp, RoundedCornerShape(22.dp)),
                     shape = RoundedCornerShape(999.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue),
                 ) {
                     Text(
-                        text = "Login",
+                        text = if (isLoading) "Logging in..." else "Login",
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             color = Color.White,
@@ -152,6 +156,14 @@ fun LoginScreen(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 0.sp
                         )
+                    )
+                }
+
+                if (!errorMessage.isNullOrBlank()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color(0xFFB3261E),
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
             }
