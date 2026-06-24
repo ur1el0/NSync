@@ -202,7 +202,7 @@ fun SettingsScreen(
                 }
             )
             SettingsDivider()
-            SettingsRow(label = "Appearance", value = "System", iconRes = R.drawable.ic_profile)
+            SettingsRow(label = "Appearance", value = "Light", iconRes = R.drawable.ic_profile)
         }
     }
 }
