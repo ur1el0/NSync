@@ -2,6 +2,8 @@
 
 NSync is a personal knowledge and memory app for capturing ideas, turning them into review cards, and tracking learning progress. The Android client uses Jetpack Compose, while the Django REST API persists per-user notes, flashcards, review outcomes, and progress in PostgreSQL.
 
+Detailed implementation documentation is available in [docs/README.md](docs/README.md).
+
 ```text
 Capture knowledge -> Create review cards -> Review -> Earn XP -> Track mastery
 ```

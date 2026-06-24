@@ -1,31 +1,25 @@
 # Register Screen
 
-Kotlin file: `mobile/app/src/main/java/com/example/mobile/ui/screens/auth/RegisterScreen.kt`  
-Route: `Routes.REGISTER`
+**Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/auth/RegisterScreen.kt`
+**Route:** `Routes.REGISTER`
 
-## Purpose
+## Purpose and Data Flow
 
-`RegisterScreen` provides the create account UI. It collects name, email, and password using the same visual language as the login screen.
+`RegisterScreen` collects display name, email, and password. It dispatches the values to `AuthViewModel.register`, which calls `AuthRepository.register`, stores returned JWT tokens, and lets `AppNavigation` redirect to Dashboard.
 
 ## Functions
 
-- `RegisterScreen(onRegisterClick, onLoginClick)` is the main composable. It stores form text locally and calls `onRegisterClick(name, email, password)` when the create account button is pressed.
-- `RegisterLabel(text)` draws the small label above each input.
+- `RegisterScreen(onRegisterClick, onLoginClick, isLoading, errorMessage)`: owns local field state, prevents blank/loading submission, and renders API validation errors.
+- `RegisterLabel(text)`: renders the compact label used above each input.
+
+## Important Imports
+
+- Compose runtime state: temporary form values.
+- Material 3 `Button`, `Card`, `Text`: form UI.
+- `AuthTextField`: shared input styling and password support.
+- Theme imports: Inter font, NSync colors, and local `TextStyle` values.
 
 ## Navigation
 
-- Opened from Login through `Routes.REGISTER`.
-- Register action navigates to `Routes.DASHBOARD`.
-- Login link calls `onLoginClick`, which returns to the previous auth screen.
-
-## Imports And Compose Pieces
-
-- `remember` and `mutableStateOf` hold form state.
-- `Column`, `Box`, `Text`, `Spacer`, and `Button` build the page.
-- `Modifier` controls padding, fill width, size, and click behavior.
-
-## Shared Components And Styling
-
-- Uses `AuthTextField` for consistent input styling.
-- Uses `NSyncBlue`, `NSyncCardWhite`, `InterFontFamily`, and local register text styles.
-- The screen is self-contained because the auth layout differs from the main app scaffold.
+- Existing-account action invokes `onLoginClick`, which returns to Login.
+- A successful registration produces an authenticated session and triggers the same Dashboard redirect as Login.

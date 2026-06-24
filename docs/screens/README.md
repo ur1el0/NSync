@@ -1,30 +1,22 @@
 # NSync Screen Documentation
 
-This folder documents each Jetpack Compose screen in the Android app.
+Each page below documents its current route, composables, data dependency, important imports, and navigation behavior. The complete callable list is in [../function-reference.md](../function-reference.md).
 
-Use these files when explaining the code, preparing a submission, or finding where a UI behavior is implemented.
+| Screen | Kotlin file | Route | Documentation |
+| --- | --- | --- | --- |
+| Login | `ui/screens/auth/LoginScreen.kt` | `LOGIN` | [login-screen.md](login-screen.md) |
+| Register | `ui/screens/auth/RegisterScreen.kt` | `REGISTER` | [register-screen.md](register-screen.md) |
+| Dashboard | `ui/screens/dashboard/DashboardScreen.kt` | `DASHBOARD` | [dashboard-screen.md](dashboard-screen.md) |
+| Knowledge Base | `ui/screens/knowledge/KnowledgeBaseScreen.kt` | `KNOWLEDGE_BASE` | [knowledge-base-screen.md](knowledge-base-screen.md) |
+| Knowledge Detail | `ui/screens/knowledge/KnowledgeDetailScreen.kt` | `KNOWLEDGE_DETAIL` | [knowledge-detail-screen.md](knowledge-detail-screen.md) |
+| New/Edit Note | `ui/screens/knowledge/NewNoteScreen.kt` | `NEW_NOTE`, `EDIT_NOTE` | [new-note-screen.md](new-note-screen.md) |
+| Review Sessions | `ui/screens/review/ReviewCardsScreen.kt` | `REVIEW_CARDS` | [review-cards-screen.md](review-cards-screen.md) |
+| Flashcard Detail | `ui/screens/review/FlashcardDetailScreen.kt` | `FLASHCARD_DETAIL` | [flashcard-detail-screen.md](flashcard-detail-screen.md) |
+| New/Edit Flashcard | `ui/screens/review/NewFlashcardScreen.kt` | `NEW_FLASHCARD`, `EDIT_FLASHCARD` | [new-flashcard-screen.md](new-flashcard-screen.md) |
+| Review Session | `ui/screens/review/ReviewSessionScreen.kt` | `REVIEW_SESSION`, `REVIEW_SESSION_NOTE` | [review-session-screen.md](review-session-screen.md) |
+| Session Complete | `ui/screens/review/SessionCompleteScreen.kt` | `SESSION_COMPLETE` | [session-complete-screen.md](session-complete-screen.md) |
+| Mastery | `ui/screens/progress/MasteryScreen.kt` | `MASTERY` | [mastery-screen.md](mastery-screen.md) |
+| Profile | `ui/screens/profile/ProfileScreen.kt` | `PROFILE` | [profile-screen.md](profile-screen.md) |
+| Settings | `ui/screens/settings/SettingsScreen.kt` | `SETTINGS` | [settings-screen.md](settings-screen.md) |
 
-## Screen Index
-
-| Screen | Kotlin file | Route |
-| --- | --- | --- |
-| Login | `ui/screens/auth/LoginScreen.kt` | `Routes.LOGIN` |
-| Register | `ui/screens/auth/RegisterScreen.kt` | `Routes.REGISTER` |
-| Dashboard | `ui/screens/dashboard/DashboardScreen.kt` | `Routes.DASHBOARD` |
-| Knowledge Base | `ui/screens/knowledge/KnowledgeBaseScreen.kt` | `Routes.KNOWLEDGE_BASE` |
-| Knowledge Detail | `ui/screens/knowledge/KnowledgeDetailScreen.kt` | `Routes.KNOWLEDGE_DETAIL` |
-| New Note | `ui/screens/knowledge/NewNoteScreen.kt` | `Routes.NEW_NOTE` |
-| Review Cards | `ui/screens/review/ReviewCardsScreen.kt` | `Routes.REVIEW_CARDS` |
-| Review Session | `ui/screens/review/ReviewSessionScreen.kt` | `Routes.REVIEW_SESSION` |
-| Session Complete | `ui/screens/review/SessionCompleteScreen.kt` | `Routes.SESSION_COMPLETE` |
-| Mastery | `ui/screens/progress/MasteryScreen.kt` | `Routes.MASTERY` |
-| Profile | `ui/screens/profile/ProfileScreen.kt` | `Routes.PROFILE` |
-
-## Shared Files
-
-- `navigation/AppNavigation.kt` owns the `NavHost` and connects screen callbacks to routes.
-- `navigation/Routes.kt` stores route constants and bottom navigation items.
-- `data/Models.kt` defines the data classes used by screens.
-- `data/SampleData.kt` provides the current static prototype data.
-- `ui/components/` contains reusable UI parts such as auth fields, cards, buttons, bottom navigation, and the main scaffold.
-- `ui/theme/` contains colors, typography, app theme, and shared text styles.
+`AppNavigation.kt` owns all route registrations. `MainScreenScaffold.kt` supplies the shared header, scroll container, and bottom navigation for tab-based screens.

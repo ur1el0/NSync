@@ -1,33 +1,26 @@
 # Login Screen
 
-Kotlin file: `mobile/app/src/main/java/com/example/mobile/ui/screens/auth/LoginScreen.kt`  
-Route: `Routes.LOGIN`
+**Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/auth/LoginScreen.kt`
+**Route:** `Routes.LOGIN`
 
-## Purpose
+## Purpose and Data Flow
 
-`LoginScreen` is the first app screen. It matches the prototype login design with the NSync logo, app title, subtitle, email/password inputs, a primary login button, and a create account link.
+`LoginScreen` collects an email and password, then sends them to `AuthViewModel.login` through `onLoginClick`. The ViewModel calls `AuthRepository.login`, saves the JWT session, and `AppNavigation` redirects the authenticated user to Dashboard.
 
 ## Functions
 
-- `LoginScreen(onLoginClick, onRegisterClick)` is the main composable. It stores the email and password text with `remember` and calls `onLoginClick(email, password)` when Login is pressed.
-- `AppLogo()` draws the rounded logo container and displays the app drawable inside it.
+- `LoginScreen(onLoginClick, onRegisterClick, isLoading, errorMessage)`: owns temporary email/password field state, disables invalid or loading submissions, renders backend errors, and opens Register.
+- `AppLogo()`: renders the rounded NSync logo surface using `Image` and `painterResource`.
+
+## Important Imports
+
+- Compose `remember` and `mutableStateOf`: form-only state.
+- Foundation `Column`, `Box`, `Spacer`, `Image`, and modifiers: layout/logo.
+- Material 3 `Button`, `Card`, and `Text`: controls and form surface.
+- `AuthTextField`: shared styled email/password input.
+- `InterFontFamily`, `NSyncBlue`, and `NSyncCardWhite`: local visual style.
 
 ## Navigation
 
-- Login is the start destination in `AppNavigation`.
-- Successful login navigates to `Routes.DASHBOARD` and removes the login screen from the back stack.
-- The create account text calls `onRegisterClick`, which navigates to `Routes.REGISTER`.
-
-## Imports And Compose Pieces
-
-- `@Composable` marks the functions that draw UI.
-- `remember` and `mutableStateOf` keep temporary form state while the screen is visible.
-- `Column`, `Box`, `Image`, `Text`, and `Spacer` build the layout.
-- `Button` creates the primary Login action.
-- `painterResource` loads the image from `res/drawable`.
-
-## Shared Components And Styling
-
-- Uses `AuthTextField` for the email and password fields.
-- Uses `InterFontFamily`, `NSyncBlue`, and `NSyncCardWhite` from the theme.
-- Uses local `TextStyle` values such as `LoginLabelStyle`, `LoginFooterStyle`, and `LoginCreateAccountStyle` for prototype-specific text.
+- Create account calls `onRegisterClick`, which navigates to `REGISTER`.
+- Successful login is handled by auth-session state in `AppNavigation`, which clears the auth route and opens `DASHBOARD`.

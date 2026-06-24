@@ -1,30 +1,21 @@
-# Review Cards Screen
+# Review Sessions Screen
 
-Kotlin file: `mobile/app/src/main/java/com/example/mobile/ui/screens/review/ReviewCardsScreen.kt`  
-Route: `Routes.REVIEW_CARDS`
+**Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/review/ReviewCardsScreen.kt`
+**Route:** `Routes.REVIEW_CARDS`
 
-## Purpose
+## Purpose and Data Flow
 
-`ReviewCardsScreen` shows the available review cards and gives the user a button to start a review session.
+This page presents sessions, not an ungrouped card list. `ReviewCardsViewModel.loadCards` fetches the user's cards, then the screen groups them by connected note ID, source-note title, and collection. Each group becomes one `ReviewSessionListItem`.
 
-## Functions
+## Functions and Imports
 
-- `ReviewCardsScreen(onStartReviewClick, onRouteClick)` is the main composable. It reads `SampleData.reviewCards` and displays the cards as a list.
+- `ReviewCardsScreen(onStartSessionClick, onAddCardClick, onRouteClick, viewModel)`: loads cards, renders loading/error/empty states, groups cards, and emits session cards.
+- `DisposableEffect`, `LifecycleEventObserver`, and `LocalLifecycleOwner`: reload data when the page resumes.
+- `MainScreenScaffold`: supplies page shell and bottom navigation.
+- `ReviewSessionListItem`: renders session title/tag/count plus Start Review and Add Card actions.
 
 ## Navigation
 
-- Opened from bottom navigation or the dashboard add action.
-- Start Review calls `onStartReviewClick`, which navigates to `Routes.REVIEW_SESSION`.
-- Bottom navigation calls `onRouteClick`.
-
-## Imports And Compose Pieces
-
-- `Column`, `Text`, and `Spacer` build the page.
-- Static sample data is shown directly because there is no database layer yet.
-
-## Shared Components And Styling
-
-- Uses `MainScreenScaffold` for the shared layout and bottom navigation.
-- Uses `ReviewCardListItem` for each card.
-- Uses `PrimaryScreenButton` for Start Review.
-- Uses shared screen text styles from `ScreenStyles.kt`.
+- Start Review opens `reviewSessionForNote(noteId)` and therefore reviews every card for that note.
+- Add Card opens `newFlashcard(noteId)`.
+- Bottom navigation is delegated through `onRouteClick`.

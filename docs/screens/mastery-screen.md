@@ -1,29 +1,19 @@
 # Mastery Screen
 
-Kotlin file: `mobile/app/src/main/java/com/example/mobile/ui/screens/progress/MasteryScreen.kt`  
-Route: `Routes.MASTERY`
+**Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/progress/MasteryScreen.kt`
+**Route:** `Routes.MASTERY`
 
-## Purpose
+## Purpose and Data Flow
 
-`MasteryScreen` shows progress by collection so the user can see what areas are strong or need more review.
+`MasteryViewModel.loadMastery` gets progress and review cards, then derives collection-level mastery data. The screen displays loading/error states, top metrics, and a `ProgressSummaryCard` for each collection.
 
-## Functions
+## Functions and Imports
 
-- `MasteryScreen(onRouteClick)` is the main composable. It reads `SampleData.collectionMastery` and renders progress cards for each collection.
+- `MasteryScreen(onRouteClick, viewModel)`: the single composable.
+- `LaunchedEffect(Unit)`: starts mastery loading once per screen entry.
+- `MainScreenScaffold`, `SummaryMetric`, and `ProgressSummaryCard`: shared page shell and presentation.
+- `MasteryViewModel`, Compose `Text`, and theme styles: data and UI dependencies.
 
 ## Navigation
 
-- Opened from bottom navigation through `Routes.MASTERY`.
-- Bottom navigation calls `onRouteClick`.
-
-## Imports And Compose Pieces
-
-- `Column`, `Text`, and `Spacer` build the page.
-- Static sample collection mastery is used until real scoring exists.
-
-## Shared Components And Styling
-
-- Uses `MainScreenScaffold` for the shared app layout.
-- Uses `ProgressSummaryCard` for each collection.
-- Uses `SummaryMetric` for top-level progress values.
-- Uses shared screen styles from `ScreenStyles.kt`.
+The screen is a bottom-navigation destination. `onRouteClick` is passed to `MainScreenScaffold`.

@@ -1,30 +1,20 @@
 # Review Session Screen
 
-Kotlin file: `mobile/app/src/main/java/com/example/mobile/ui/screens/review/ReviewSessionScreen.kt`  
-Route: `Routes.REVIEW_SESSION`
+**Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/review/ReviewSessionScreen.kt`
+**Routes:** `Routes.REVIEW_SESSION`, `Routes.REVIEW_SESSION_NOTE` with optional `noteId`
 
-## Purpose
+## Purpose and Data Flow
 
-`ReviewSessionScreen` shows the active quiz/review card flow. It displays a question first, then reveals the answer when the user presses Show Answer.
+`ReviewSessionScreen` loads either all cards or cards for one note through `ReviewSessionViewModel.loadSession`. It first shows a question, reveals the answer locally, then records `Review again` or `Got it`. Each rating becomes a `ReviewAnswerDto`. When the last card is rated, the ViewModel sends the complete list to the API and exposes `ReviewSessionResult`.
 
-## Functions
+## Functions and Imports
 
-- `ReviewSessionScreen(onCompleteClick)` is the main composable. It keeps `showAnswer` state and toggles between the question and answer views.
+- `ReviewSessionScreen`: controls local `showAnswer`, observes `completedResult`, and calls `onCompleteClick(score, totalQuestions, xpEarned)`.
+- `LaunchedEffect(noteId, cardId)`: loads the matching session.
+- `LaunchedEffect(currentIndex)`: hides the answer for the next card.
+- `CenteredCard` and `PrimaryScreenButton`: shared card and reveal action.
+- Material `Button`/`OutlinedButton`, lazy layout, and `ReviewSessionViewModel`: answer controls, scrolling, and backend flow.
 
 ## Navigation
 
-- Opened from Dashboard, Knowledge Detail, or Review Cards.
-- The finish action calls `onCompleteClick`, which navigates to `Routes.SESSION_COMPLETE`.
-- This screen intentionally does not show bottom navigation so the review session stays focused.
-
-## Imports And Compose Pieces
-
-- `remember` and `mutableStateOf` control whether the answer is visible.
-- `Card`, `LinearProgressIndicator`, `Button`, `TextButton`, `IconButton`, `Column`, and `Row` build the review UI.
-- `painterResource` loads the back arrow, XP icon, and profile/logo image.
-
-## Shared Components And Styling
-
-- Uses `SampleData.draftReviewCardQuestion` and `SampleData.draftReviewCardAnswer`.
-- Uses theme colors and Inter typography directly in the screen.
-- Current behavior is prototype-level: it reviews one sample card and then allows completion.
+The screen has no bottom navigation so the review stays focused. Completion opens `sessionComplete(score, totalQuestions, xpEarned)`.

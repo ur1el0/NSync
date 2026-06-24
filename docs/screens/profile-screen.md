@@ -1,30 +1,21 @@
 # Profile Screen
 
-Kotlin file: `mobile/app/src/main/java/com/example/mobile/ui/screens/profile/ProfileScreen.kt`  
-Route: `Routes.PROFILE`
+**Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/profile/ProfileScreen.kt`
+**Route:** `Routes.PROFILE`
 
-## Purpose
+## Purpose and Data Flow
 
-`ProfileScreen` shows the user's profile, study stats, and a logout button.
+Profile combines static presentation fields currently sourced from `SampleData.userProfile` with live progress from `ProfileViewModel.loadProfile`. The UI constrains its cards/actions to a centered readable width and displays level, XP, review count, streak, and accuracy.
 
-## Functions
+## Functions and Imports
 
-- `ProfileScreen(onRouteClick, onLogoutClick)` is the main composable. It reads `SampleData.userProfile`, shows user details, and wires Logout to the navigation callback.
-- `ProfileStatCard(iconRes, iconTint, value, label)` draws a reusable stat card for streak and accuracy.
+- `ProfileScreen(onRouteClick, onSettingsClick, onLogoutClick, profileViewModel)`: loads progress on lifecycle resume and renders profile/actions.
+- `ProfileStatCard`: reusable centered streak or accuracy card.
+- Lifecycle `DisposableEffect`, `LifecycleEventObserver`, and `LocalLifecycleOwner`: refresh progress at `ON_RESUME`.
+- `MainScreenScaffold`, Material cards/buttons, `SampleData`, `ProfileViewModel`, and theme imports: layout, action, identity placeholder, data, and visual design.
 
 ## Navigation
 
-- Opened from bottom navigation through `Routes.PROFILE`.
-- Logout calls `onLogoutClick`, which navigates to `Routes.LOGIN` and clears the app stack.
-- Bottom navigation calls `onRouteClick`.
-
-## Imports And Compose Pieces
-
-- `Card`, `Image`, `Icon`, `Button`, `Column`, `Row`, `Text`, and `Spacer` build the profile layout.
-- `painterResource` loads the profile image and the two stat icons reused from Dashboard.
-
-## Shared Components And Styling
-
-- Uses `MainScreenScaffold` for the shared app frame.
-- Reuses dashboard-style stat icons: `ic_wind` and `ic_target`.
-- Uses theme colors, Inter typography, and local profile layout values.
+- Settings opens `SETTINGS`.
+- Logout calls `AuthViewModel.logout` through `AppNavigation`; navigation then redirects to Login.
+- Bottom navigation remains available through the scaffold.

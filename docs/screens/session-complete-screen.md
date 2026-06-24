@@ -1,29 +1,28 @@
 # Session Complete Screen
 
-Kotlin file: `mobile/app/src/main/java/com/example/mobile/ui/screens/review/SessionCompleteScreen.kt`  
-Route: `Routes.SESSION_COMPLETE`
+**Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/review/SessionCompleteScreen.kt`
+**Route:** `Routes.SESSION_COMPLETE` with score, totalQuestions, and xpEarned
 
-## Purpose
+## Purpose and Data Flow
 
-`SessionCompleteScreen` confirms that a review session finished and summarizes the result.
+The route carries the immediate session result. `SessionCompleteViewModel.loadProgress` then reloads persisted backend progress so the screen can display current streak, level, and accuracy rather than only local values.
 
 ## Functions
 
-- `SessionCompleteScreen(onDashboardClick)` is the main composable. It reads `SampleData.sessionSummary` and displays XP, cards reviewed, accuracy, and mastery progress.
+- `SessionCompleteScreen`: root composable; loads progress and renders summary/actions.
+- `SessionCompleteTopBar`: dashboard back affordance and NSync branding.
+- `SessionMetricCard`: score/accuracy metric presentation.
+- `XpEarnedCard`: XP result card.
+- `StreakCard`: streak and visual day-progress presentation.
+- `LevelProgressSection`: calculates level range and renders a progress indicator.
+
+## Important Imports
+
+- Material `Scaffold`, `Card`, `Button`, `OutlinedButton`, `LinearProgressIndicator` and Compose scroll/layout APIs build the result layout.
+- `BottomNavBar`, `SessionCompleteViewModel`, route constants, and theme imports provide navigation, data, and style.
 
 ## Navigation
 
-- Opened from `ReviewSessionScreen` through `Routes.SESSION_COMPLETE`.
-- The dashboard button calls `onDashboardClick`, which navigates back to `Routes.DASHBOARD`.
-
-## Imports And Compose Pieces
-
-- `Column`, `Text`, and `Spacer` build the result layout.
-- The page is not wrapped in bottom navigation because it is part of the review flow.
-
-## Shared Components And Styling
-
-- Uses `SummaryMetric` for compact result values.
-- Uses `ProgressSummaryCard` for the mastery summary.
-- Uses `PrimaryScreenButton` for the dashboard action.
-- Uses `ScreenHeroStyle`, `ScreenBodyStyle`, and shared screen styles.
+- Review Again opens a new `REVIEW_SESSION`.
+- Back to Dashboard clears/replaces the review path with `DASHBOARD`.
+- Bottom navigation is rendered in the screen scaffold.
