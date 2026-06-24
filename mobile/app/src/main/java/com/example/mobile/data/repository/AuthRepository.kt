@@ -136,4 +136,32 @@ class AuthRepository(
             email = user.email,
         )
     }
+
+    suspend fun verifySession(): Result<AuthSession?> {
+        return try {
+            val session = sessionFlow.first()
+                ?: return Result.success(null)
+            val response = apiService.getAuthenticatedUser()
+
+            if (!response.isSuccessful) {
+                authSessionStore.clearSession()
+                return Result.success(null)
+            }
+
+            val user = response.body()
+                ?: return Result.failure(
+                    IllegalStateException("Session verification returned no user data."),
+                )
+            val verifiedSession = session.copy(
+                userId = user.id,
+                displayName = user.displayName,
+                email = user.email,
+            )
+            authSessionStore.saveSession(verifiedSession)
+
+            Result.success(verifiedSession)
+        } catch (exception: Exception) {
+            Result.failure(exception)
+        }
+    }
 }
