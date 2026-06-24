@@ -39,10 +39,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile.R
 import com.example.mobile.data.KnowledgeItem
-import com.example.mobile.data.SampleData
-import com.example.mobile.data.UserProfile
 import com.example.mobile.navigation.Routes
 import com.example.mobile.ui.components.BottomNavBar
 import com.example.mobile.ui.theme.InterFontFamily
@@ -51,16 +50,20 @@ import com.example.mobile.ui.theme.NSyncCardWhite
 import com.example.mobile.ui.theme.NSyncLightBackground
 import com.example.mobile.ui.theme.NSyncMutedText
 import com.example.mobile.ui.theme.NSyncRed
+import com.example.mobile.ui.viewmodel.DashboardViewModel
+import com.example.mobile.data.remote.dto.UserProgressDto
+import kotlin.math.roundToInt
+
 
 @Composable
 fun DashboardScreen(
     onStartReviewClick: () -> Unit = {},
     onKnowledgeClick: (KnowledgeItem) -> Unit = {},
     onAddClick: () -> Unit = {},
-    onRouteClick: (String) -> Unit = {}
+    onRouteClick: (String) -> Unit = {},
+    dashboardViewModel: DashboardViewModel = viewModel()
 ) {
-    val user = SampleData.userProfile
-    val recentKnowledge = SampleData.dashboardRecentKnowledge
+    val uiState = dashboardViewModel.uiState
 
     Scaffold(
         containerColor = NSyncLightBackground,
@@ -84,15 +87,38 @@ fun DashboardScreen(
             }
 
             item {
-                DashboardGreeting(user.name)
+                DashboardGreeting("Roosc")
+            }
+
+            if (uiState.isLoading) {
+                item {
+                    Text(
+                        text = "Loading dashboard...",
+                        color = NSyncMutedText,
+                        style = DashboardBodyStyle
+                    )
+                }
+            }
+
+            uiState.error?.let { message ->
+                item {
+                    Text(
+                        text = "Unable to load dashboard: $message",
+                        color = Color(0xFFD21F2B),
+                        style = DashboardBodyStyle
+                    )
+                }
             }
 
             item {
-                LevelProgressCard(user)
+                LevelProgressCard(uiState.progress)
             }
 
             item {
-                DashboardStatsRow(user.streakDays, user.accuracyPercent)
+                DashboardStatsRow(
+                    streakDays = uiState.progress?.streak ?: 0,
+                    accuracyPercent = uiState.progress?.accuracy?.roundToInt() ?: 0
+                )
             }
 
             item {
@@ -104,7 +130,7 @@ fun DashboardScreen(
 
             item {
                 RecentKnowledgeSection(
-                    recentKnowledge = recentKnowledge,
+                    recentKnowledge = uiState.recentKnowledge.firstOrNull(),
                     onKnowledgeClick = onKnowledgeClick
                 )
             }
@@ -168,9 +194,16 @@ private fun DashboardGreeting(name: String) {
 }
 
 @Composable
-private fun LevelProgressCard(user: UserProfile) {
-    val totalForLevel = user.totalXp + user.xpToNextLevel
-    val progress = user.totalXp.toFloat() / totalForLevel.toFloat()
+private fun LevelProgressCard(progress: UserProgressDto?) {
+    val level = progress?.level ?: 1
+    val totalXp = progress?.totalXp ?: 0
+    val levelStartXp = levelStartXp(level)
+    val nextLevelXp = nextLevelXp(level)
+    val xpToNextLevel = nextLevelXp?.let { (it - totalXp).coerceAtLeast(0) }
+    val progressPercent = nextLevelXp?.let { nextXp ->
+        ((totalXp - levelStartXp).toFloat() / (nextXp - levelStartXp))
+            .coerceIn(0f, 1f)
+    } ?: 1f
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -195,19 +228,21 @@ private fun LevelProgressCard(user: UserProfile) {
                 verticalAlignment = Alignment.Bottom
             ) {
                 Text(
-                    text = "Level ${user.level}",
+                    text = "Level $level",
                     color = NSyncBlue,
                     style = DashboardLevelStyle
                 )
                 Text(
-                    text = "${formatNumber(user.totalXp)} XP • ${user.xpToNextLevel} to Level ${user.level + 1}",
+                    text = xpToNextLevel?.let {
+                        "${formatNumber(totalXp)} XP • $it to Level ${level + 1}"
+                    } ?: "${formatNumber(totalXp)} XP • Maximum level",
                     color = NSyncMutedText,
                     style = DashboardSmallBoldStyle
                 )
             }
 
             LinearProgressIndicator(
-                progress = { progress },
+                progress = { progressPercent },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp)
@@ -339,7 +374,7 @@ private fun DashboardActions(
 
 @Composable
 private fun RecentKnowledgeSection(
-    recentKnowledge: KnowledgeItem,
+    recentKnowledge: KnowledgeItem?,
     onKnowledgeClick: (KnowledgeItem) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -348,6 +383,15 @@ private fun RecentKnowledgeSection(
             color = DashboardTitle,
             style = DashboardSectionTitleStyle
         )
+
+        if (recentKnowledge == null) {
+            Text(
+                text = "No knowledge saved yet.",
+                color = NSyncMutedText,
+                style = DashboardBodyStyle
+            )
+            return@Column
+        }
 
         Card(
             modifier = Modifier
@@ -430,6 +474,22 @@ private fun InfoPill(text: String) {
             style = DashboardPillStyle
         )
     }
+}
+
+private fun levelStartXp(level: Int): Int = when (level) {
+    5 -> 1000
+    4 -> 500
+    3 -> 250
+    2 -> 100
+    else -> 0
+}
+
+private fun nextLevelXp(level: Int): Int? = when (level) {
+    1 -> 100
+    2 -> 250
+    3 -> 500
+    4 -> 1000
+    else -> null
 }
 
 private fun formatNumber(value: Int): String = "%,d".format(value)
