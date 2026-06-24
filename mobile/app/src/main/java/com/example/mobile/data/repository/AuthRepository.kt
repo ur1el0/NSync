@@ -8,6 +8,7 @@ import com.example.mobile.data.remote.dto.AuthResponseDto
 import com.example.mobile.data.remote.dto.LoginRequestDto
 import com.example.mobile.data.remote.dto.RefreshRequestDto
 import com.example.mobile.data.remote.dto.RegisterRequestDto
+import com.example.mobile.data.remote.dto.AuthenticatedUserDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -141,27 +142,67 @@ class AuthRepository(
         return try {
             val session = sessionFlow.first()
                 ?: return Result.success(null)
+
             val response = apiService.getAuthenticatedUser()
 
-            if (!response.isSuccessful) {
+            if (response.isSuccessful) {
+                val user = response.body()
+                    ?: return Result.failure(
+                        IllegalStateException("Session verification returned no user data."),
+                    )
+
+                return Result.success(saveVerifiedSession(session, user))
+            }
+
+            if (response.code() != 401) {
+                return Result.failure(
+                    IllegalStateException(
+                        "Session verification failed with HTTP ${response.code()}.",
+                    ),
+                )
+            }
+
+            if (refreshSession().isFailure) {
                 authSessionStore.clearSession()
                 return Result.success(null)
             }
 
-            val user = response.body()
-                ?: return Result.failure(
-                    IllegalStateException("Session verification returned no user data."),
-                )
-            val verifiedSession = session.copy(
-                userId = user.id,
-                displayName = user.displayName,
-                email = user.email,
-            )
-            authSessionStore.saveSession(verifiedSession)
+            val retryResponse = apiService.getAuthenticatedUser()
 
-            Result.success(verifiedSession)
-        } catch (exception: Exception) {
-            Result.failure(exception)
+            if (retryResponse.isSuccessful) {
+                val user = retryResponse.body()
+                    ?: return Result.failure(
+                        IllegalStateException("Session retry returned no user data."),
+                    )
+
+                return Result.success(saveVerifiedSession(session, user))
+            }
+
+            if (retryResponse.code() == 401) {
+                authSessionStore.clearSession()
+                return Result.success(null)
+            }
+
+            Result.failure(
+                IllegalStateException(
+                        "Session retry failed with HTTP ${retryResponse.code()}.",
+                    ),
+                )
+            } catch (exception: Exception) {
+                Result.failure(exception)
+            }
         }
+
+    private suspend fun saveVerifiedSession(
+        session: AuthSession,
+        user: AuthenticatedUserDto,
+        ): AuthSession {
+        val verifiedSession = session.copy(
+            userId = user.id,
+            displayName = user.displayName,
+            email = user.email,
+        )
+        authSessionStore.saveSession(verifiedSession)
+        return verifiedSession
     }
 }
