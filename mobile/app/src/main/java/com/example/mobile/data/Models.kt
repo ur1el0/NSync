@@ -34,7 +34,8 @@ data class ReviewCard(
     val difficulty: String,
     val masteryLabel: String,
     val masteryPercent: Int,
-    val updatedLabel: String
+    val updatedLabel: String,
+    val sourceNoteTitle: String = collection
 )
 
 data class CollectionMastery(
@@ -57,4 +58,14 @@ data class ReviewSessionSummary(
     val streakDays: Int,
     val levelLabel: String,
     val xpToNextLevel: Int
+)
+
+data class LoginRequest(
+    val email: String,
+    val name: String // Backend User model only has name and email for now
+)
+
+data class RegisterRequest(
+    val email: String,
+    val name: String
 )
