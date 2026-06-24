@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -90,77 +91,107 @@ fun ProfileScreen(
         }
 
         item {
-            Card(
+            Box(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NSyncCardWhite),
-                shape = RoundedCornerShape(18.dp),
-                border = ScreenCardBorder
+                contentAlignment = Alignment.Center
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Card(
+                    modifier = Modifier
+                        .widthIn(max = 380.dp)
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = NSyncCardWhite),
+                    shape = RoundedCornerShape(18.dp),
+                    border = ScreenCardBorder
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Color(0xFFE8F1FF)),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(user.name.take(1), color = NSyncBlue, style = ScreenHeroStyle)
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Color(0xFFE8F1FF)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(user.name.take(1), color = NSyncBlue, style = ScreenHeroStyle)
+                        }
+                        Text(user.name, color = Color(0xFF151927), style = ScreenSectionStyle)
+                        Text(user.email, color = NSyncMutedText, style = ScreenBodyStyle)
+                        Text(user.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
+                        Text("LVL ${progress?.level ?: 1}", color = NSyncBlue, style = ScreenSectionStyle)
+                        Text(
+                            "$totalXp XP - $totalReviews cards reviewed",
+                            color = NSyncMutedText,
+                            style = ScreenBodyStyle
+                        )
                     }
-                    Text(user.name, color = Color(0xFF151927), style = ScreenSectionStyle)
-                    Text(user.email, color = NSyncMutedText, style = ScreenBodyStyle)
-                    Text(user.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
-                    Text("LVL ${progress?.level ?: 1}", color = NSyncBlue, style = ScreenSectionStyle)
-                    Text(
-                        "$totalXp XP - $totalReviews cards reviewed",
-                        color = NSyncMutedText,
-                        style = ScreenBodyStyle
+                }
+            }
+        }
+
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    modifier = Modifier
+                        .widthIn(max = 380.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    ProfileStatCard(
+                        modifier = Modifier.weight(1f),
+                        icon = R.drawable.ic_wind,
+                        iconTint = NSyncRed,
+                        value = (progress?.streak ?: 0).toString(),
+                        label = "Day streak"
+                    )
+                    ProfileStatCard(
+                        modifier = Modifier.weight(1f),
+                        icon = R.drawable.ic_target,
+                        iconTint = NSyncBlue,
+                        value = "${progress?.accuracy?.roundToInt() ?: 0}%",
+                        label = "Accuracy"
                     )
                 }
             }
         }
 
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ProfileStatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = R.drawable.ic_wind,
-                    iconTint = NSyncRed,
-                    value = (progress?.streak ?: 0).toString(),
-                    label = "Day streak"
-                )
-                ProfileStatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = R.drawable.ic_target,
-                    iconTint = NSyncBlue,
-                    value = "${progress?.accuracy?.roundToInt() ?: 0}%",
-                    label = "Accuracy"
-                )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                OutlinedButton(
+                    onClick = onSettingsClick,
+                    modifier = Modifier
+                        .widthIn(max = 380.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Settings", color = NSyncBlue, style = ScreenSectionStyle)
+                }
             }
         }
 
         item {
-            OutlinedButton(
-                onClick = onSettingsClick,
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Text("Settings", color = NSyncBlue, style = ScreenSectionStyle)
-            }
-        }
-
-        item {
-            Button(
-                onClick = onLogoutClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(999.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = NSyncRed)
-            ) {
-                Text("Logout", color = Color.White, style = ScreenSectionStyle)
+                Button(
+                    onClick = onLogoutClick,
+                    modifier = Modifier
+                        .widthIn(max = 380.dp)
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(999.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = NSyncRed)
+                ) {
+                    Text("Logout", color = Color.White, style = ScreenSectionStyle)
+                }
             }
         }
     }

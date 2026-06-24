@@ -1,24 +1,17 @@
 package com.example.mobile.ui.screens.review
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
 import com.example.mobile.navigation.Routes
 import com.example.mobile.ui.components.MainScreenScaffold
+import com.example.mobile.ui.components.ReviewSessionListItem
 import com.example.mobile.ui.theme.NSyncMutedText
-import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.ScreenBodyStyle
-import com.example.mobile.ui.theme.ScreenSectionStyle
-import com.example.mobile.ui.theme.ScreenSmallBoldStyle
-import com.example.mobile.ui.theme.ScreenTitle
 import com.example.mobile.ui.viewmodel.ReviewCardsViewModel
 
 @Composable
@@ -71,20 +64,13 @@ fun ReviewCardsScreen(
         cardsBySession.forEach { (session, cards) ->
             val (noteId, noteTitle, tag) = session
             item(key = "session-$noteId") {
-                Text(noteTitle, color = ScreenTitle, style = ScreenSectionStyle)
-                Text(
-                    text = "$tag - ${cards.size} card${if (cards.size == 1) "" else "s"}",
-                    color = NSyncMutedText,
-                    style = ScreenSmallBoldStyle
+                ReviewSessionListItem(
+                    title = noteTitle,
+                    tag = tag,
+                    cardCount = cards.size,
+                    onStartSessionClick = { onStartSessionClick(noteId) },
+                    onAddCardClick = { onAddCardClick(noteId) }
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(onClick = { onStartSessionClick(noteId) }) {
-                        Text("Start session", color = NSyncBlue, style = ScreenSmallBoldStyle)
-                    }
-                    TextButton(onClick = { onAddCardClick(noteId) }) {
-                        Text("Add card", color = NSyncBlue, style = ScreenSmallBoldStyle)
-                    }
-                }
             }
         }
     }

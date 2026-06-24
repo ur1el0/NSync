@@ -142,18 +142,23 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
-                        .shadow(15.dp, RoundedCornerShape(22.dp)),
+                        .shadow(8.dp, RoundedCornerShape(999.dp)),
                     shape = RoundedCornerShape(999.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = NSyncBlue,
+                        disabledContainerColor = NSyncBlue.copy(alpha = 0.45f),
+                        disabledContentColor = Color.White
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                 ) {
                     Text(
                         text = if (isLoading) "Logging in..." else "Login",
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             color = Color.White,
-                            fontSize = 20.sp,
-                            lineHeight = 18.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            lineHeight = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
                             letterSpacing = 0.sp
                         )
                     )
