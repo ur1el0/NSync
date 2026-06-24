@@ -43,13 +43,10 @@ import com.example.mobile.ui.theme.InterFontFamily
 import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncCardWhite
 
-
 @Composable
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit,
-    onRegisterClick: () -> Unit,
-    isLoading: Boolean,
-    errorMessage: String?,
+    onRegisterClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -137,38 +134,24 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
-                    onClick = { onLoginClick(email.trim(), password) },
-                    enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
+                    onClick = { onLoginClick(email, password) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
-                        .shadow(8.dp, RoundedCornerShape(999.dp)),
+                        .shadow(15.dp, RoundedCornerShape(22.dp)),
                     shape = RoundedCornerShape(999.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = NSyncBlue,
-                        disabledContainerColor = NSyncBlue.copy(alpha = 0.45f),
-                        disabledContentColor = Color.White
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+                    colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue)
                 ) {
                     Text(
-                        text = if (isLoading) "Logging in..." else "Login",
+                        text = "Login",
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             color = Color.White,
-                            fontSize = 15.sp,
-                            lineHeight = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            lineHeight = 18.sp,
+                            fontWeight = FontWeight.Bold,
                             letterSpacing = 0.sp
                         )
-                    )
-                }
-
-                if (!errorMessage.isNullOrBlank()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color(0xFFB3261E),
-                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
             }
