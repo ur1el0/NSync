@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,8 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile.R
-import com.example.mobile.data.SampleData
 import com.example.mobile.navigation.Routes
 import com.example.mobile.ui.components.BottomNavBar
 import com.example.mobile.ui.theme.InterFontFamily
@@ -46,14 +47,28 @@ import com.example.mobile.ui.theme.NSyncCardWhite
 import com.example.mobile.ui.theme.NSyncLightBackground
 import com.example.mobile.ui.theme.NSyncMutedText
 import com.example.mobile.ui.theme.ScreenTitle
+import com.example.mobile.ui.viewmodel.SessionCompleteViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun SessionCompleteScreen(
+    score: Int,
+    totalQuestions: Int,
+    xpEarned: Int,
     onDashboardClick: () -> Unit,
     onReviewAgainClick: () -> Unit,
-    onRouteClick: (String) -> Unit
+    onRouteClick: (String) -> Unit,
+    viewModel: SessionCompleteViewModel = viewModel()
 ) {
-    val summary = SampleData.sessionSummary
+    LaunchedEffect(Unit) {
+        viewModel.loadProgress()
+    }
+
+    val progress = viewModel.uiState.progress
+    val displayedScore = score
+    val displayedTotal = totalQuestions
+    val accuracyPercent = progress?.accuracy?.roundToInt()
+        ?: if (totalQuestions == 0) 0 else (score * 100 / totalQuestions)
 
     Scaffold(
         containerColor = NSyncLightBackground,
@@ -106,19 +121,35 @@ fun SessionCompleteScreen(
                 textAlign = TextAlign.Center
             )
 
+            if (viewModel.uiState.isLoading) {
+                Text("Loading updated progress...", color = NSyncMutedText, style = SessionBodyStyle)
+            }
+
+            viewModel.uiState.error?.let { message ->
+                Text(message, color = Color(0xFFD21F2B), style = SessionBodyStyle)
+                OutlinedButton(
+                    onClick = { viewModel.loadProgress() }
+                ) {
+                    Text("Retry", style = SessionOutlineButtonStyle)
+                }
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                SessionMetricCard("Score", summary.score, Modifier.weight(1f))
-                SessionMetricCard("Accuracy", "${summary.accuracyPercent}%", Modifier.weight(1f))
+                SessionMetricCard("Score", "$displayedScore/$displayedTotal", Modifier.weight(1f))
+                SessionMetricCard("Accuracy", "$accuracyPercent%", Modifier.weight(1f))
             }
 
-            XpEarnedCard(xpEarned = summary.xpEarned)
+            XpEarnedCard(xpEarned = xpEarned)
 
-            StreakCard(streakDays = summary.streakDays)
+            StreakCard(streakDays = progress?.streak ?: 0)
 
-            LevelProgressSection(xpToNextLevel = summary.xpToNextLevel)
+            LevelProgressSection(
+                level = progress?.level ?: 1,
+                totalXp = progress?.totalXp ?: 0
+            )
 
             Button(
                 onClick = onReviewAgainClick,
@@ -287,7 +318,26 @@ private fun StreakCard(streakDays: Int) {
 }
 
 @Composable
-private fun LevelProgressSection(xpToNextLevel: Int) {
+private fun LevelProgressSection(level: Int, totalXp: Int) {
+    val levelStartXp = when (level) {
+        5 -> 1000
+        4 -> 500
+        3 -> 250
+        2 -> 100
+        else -> 0
+    }
+    val nextLevelXp = when (level) {
+        1 -> 100
+        2 -> 250
+        3 -> 500
+        4 -> 1000
+        else -> null
+    }
+    val progressFraction = nextLevelXp?.let { nextXp ->
+        ((totalXp - levelStartXp).toFloat() / (nextXp - levelStartXp))
+            .coerceIn(0f, 1f)
+    } ?: 1f
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -296,11 +346,16 @@ private fun LevelProgressSection(xpToNextLevel: Int) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Level", color = NSyncMutedText, style = SessionTinyStyle)
-            Text("$xpToNextLevel XP to Level 6", color = NSyncBlue, style = SessionTinyBoldBlueStyle)
+            Text("Level $level", color = NSyncMutedText, style = SessionTinyStyle)
+            Text(
+                text = nextLevelXp?.let { "${(it - totalXp).coerceAtLeast(0)} XP to Level ${level + 1}" }
+                    ?: "Maximum level reached",
+                color = NSyncBlue,
+                style = SessionTinyBoldBlueStyle
+            )
         }
         LinearProgressIndicator(
-            progress = { 0.82f },
+            progress = { progressFraction },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(9.dp)
