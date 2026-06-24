@@ -1,212 +1,153 @@
 # NSync
 
-NSync is a gamified personal knowledge and memory app. It helps users capture important ideas, organize them into a knowledge base, create review cards, review through quiz-style sessions, and track mastery using XP, levels, streaks, accuracy, and progress.
-
-The app is designed for students, self-learners, professionals, certification reviewers, interview preparation, work training, and other learning goals.
+NSync is a personal knowledge and memory app for capturing ideas, turning them into review cards, and tracking learning progress. The Android client uses Jetpack Compose, while the Django REST API persists per-user notes, flashcards, review outcomes, and progress in PostgreSQL.
 
 ```text
 Capture knowledge -> Create review cards -> Review -> Earn XP -> Track mastery
 ```
 
-## Current Scope
+## Features
 
-This repository contains a Django backend and a Kotlin Android mobile app.
+- JWT authentication: register, login, token refresh, logout, and restored sessions.
+- Per-user knowledge base with create, read, update, and delete note flows.
+- Flashcards connected to a source note and organized into review sessions by note and collection.
+- Multi-card review sessions with answer reveal, recall ratings, XP, accuracy, streak, and mastery updates.
+- Dashboard, profile, and mastery views backed by user progress data.
+- Settings for review goal, reminder time, difficulty, streak reminders, and notifications.
+- Bottom navigation and dedicated screens for authentication, knowledge, review, progress, profile, and settings.
 
-The current mobile goal is a 50% Jetpack Compose implementation that matches the finished prototype direction. It focuses on static sample data, navigation, and the main user interface.
+## Tech Stack
 
-Implemented in the current 50% mobile version:
+### Android client
 
-- Login / create account UI
-- Dashboard
-- Knowledge Base
-- Knowledge Detail
-- New Note
-- Review Cards
-- Review Session
-- Session Complete
-- Mastery / Progress
-- User Profile
-- Bottom navigation
-- Static sample data
+- Kotlin and Jetpack Compose with Material 3
+- Navigation Compose
+- ViewModel and Compose UI state
+- Retrofit, OkHttp, and Gson for HTTP requests
+- DataStore Preferences for local JWT session storage
+- Android notification scheduling for review reminders
 
-Not included yet:
+### Backend
 
-- Real authentication
-- Persistent database saving in mobile
-- Django API connection
-- OCR
-- AI-generated review cards
-- Full editable forms
-- Persistent quiz scoring
-
-## Prototype
-
-The finished prototype frames are stored in:
-
-```text
-nsync-frames.pdf
-```
-
-The prototype presents NSync as a generalized knowledge review app, not only a student flashcard app.
+- Python, Django, and Django REST Framework
+- PostgreSQL running in Docker Compose
+- Simple JWT for token authentication
+- `django-cors-headers` and environment-based Django configuration
 
 ## Project Structure
 
 ```text
 NSync/
   backend/
-    manage.py
-    NSync/
-    core/
+    NSync/                 Django configuration
+    core/                  Models, serializers, API views, tests, migrations
+    docker-compose.yml     PostgreSQL service
+    requirements.txt
 
   mobile/
-    app/
-      src/main/java/com/example/mobile/
-        MainActivity.kt
-        data/
-        navigation/
-        ui/
-          components/
-          screens/
-            auth/
-            dashboard/
-            knowledge/
-            profile/
-            progress/
-            review/
-          theme/
+    app/src/main/java/com/example/mobile/
+      data/                DTOs, Retrofit, repositories, DataStore session
+      navigation/          Routes and navigation graph
+      notifications/       Review reminder scheduling
+      ui/
+        components/        Reusable Compose UI
+        screens/           Auth, dashboard, knowledge, review, profile, settings
+        state/             Screen UI state classes
+        theme/             Colors, typography, and shared styles
+        viewmodel/         Screen logic and API coordination
 
-  docs/
-    mobile-compose-guide.md
-    screens/
-
-  nsync-context.md
-  nsync-mobile-plan.md
-  nsync-frames.pdf
-  readme.md
+  nsync-frames.pdf         UI prototype reference
 ```
 
-## Screen Documentation
+## API Overview
 
-Each Compose screen has a separate Markdown explanation in `docs/screens/`.
+The backend exposes the following API routes under `/api/`:
 
-Start here:
+| Area | Routes |
+| --- | --- |
+| Authentication | `auth/register/`, `auth/login/`, `auth/refresh/`, `auth/logout/`, `auth/me/` |
+| Notes | `notes/` and `notes/{id}/` |
+| Flashcards | `flashcards/` and `flashcards/{id}/` |
+| Learning progress | `progress/`, `review/complete/` |
+| Health check | `health/` |
 
-```text
-docs/screens/README.md
-```
+Authenticated API resources are scoped to the signed-in user. A token from `auth/login/` or `auth/register/` is required for protected routes.
 
-Those files explain each screen's Kotlin path, route, purpose, included functions, navigation links, shared components, and styling sources.
+## Local Development Procedure
 
-## Android Mobile Plan
+### 1. Configure and run the backend
 
-The Android app uses Kotlin and Jetpack Compose.
-
-Current Kotlin structure:
-
-```text
-mobile/app/src/main/java/com/example/mobile/
-|
-|-- MainActivity.kt
-|
-|-- data/
-|   |-- Models.kt
-|   |-- SampleData.kt
-|
-|-- navigation/
-|   |-- AppNavigation.kt
-|   |-- Routes.kt
-|
-|-- ui/
-|   |-- components/
-|   |   |-- BottomNavBar.kt
-|   |   |-- AuthTextField.kt
-|   |   |-- KnowledgeListCard.kt
-|   |   |-- MainScreenScaffold.kt
-|   |   |-- ReviewCardListItem.kt
-|   |   |-- ScreenButtons.kt
-|   |   |-- ScreenCards.kt
-|   |
-|   |-- screens/
-|   |   |-- auth/
-|   |   |   |-- LoginScreen.kt
-|   |   |   |-- RegisterScreen.kt
-|   |   |-- dashboard/
-|   |   |   |-- DashboardScreen.kt
-|   |   |-- knowledge/
-|   |   |   |-- KnowledgeBaseScreen.kt
-|   |   |   |-- KnowledgeDetailScreen.kt
-|   |   |   |-- NewNoteScreen.kt
-|   |   |-- profile/
-|   |   |   |-- ProfileScreen.kt
-|   |   |-- progress/
-|   |   |   |-- MasteryScreen.kt
-|   |   |-- review/
-|   |   |   |-- ReviewCardsScreen.kt
-|   |   |   |-- ReviewSessionScreen.kt
-|   |   |   |-- SessionCompleteScreen.kt
-|   |
-|   |-- theme/
-|       |-- Color.kt
-|       |-- ScreenStyles.kt
-|       |-- Theme.kt
-|       |-- Type.kt
-```
-
-Build order for the mobile app:
-
-1. `Models.kt`
-2. `SampleData.kt`
-3. `Routes.kt`
-4. `AppNavigation.kt`
-5. `MainActivity.kt`
-6. `BottomNavBar.kt`
-7. `DashboardScreen.kt`
-8. `KnowledgeBaseScreen.kt`
-9. `ReviewCardsScreen.kt`
-10. `ReviewSessionScreen.kt`
-11. `MasteryScreen.kt`
-12. `ProfileScreen.kt`
-
-Then add:
-
-- `KnowledgeDetailScreen.kt`
-- `SessionCompleteScreen.kt`
-- `RegisterScreen.kt`
-- `NewNoteScreen.kt`
-
-## Backend
-
-Run Django commands from the `backend/` directory:
+From the repository root:
 
 ```bash
 cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+Set a unique `DJANGO_SECRET_KEY` and matching PostgreSQL values in `backend/.env`. Do not commit `.env`.
+
+Start PostgreSQL, apply migrations, run tests, and start Django:
+
+```bash
+docker compose up -d db
+python manage.py migrate
+python manage.py test core
 python manage.py runserver
 ```
 
-The Django backend is planned for API and data persistence later. The current mobile phase does not require backend integration yet.
+The API runs at `http://127.0.0.1:8000/` by default.
 
-## Android Build
+### 2. Connect an Android emulator
 
-Run Android Gradle commands from the `mobile/` directory:
+The Android app uses `http://127.0.0.1:8000/` as its development API base URL. Reverse the emulator port so that this address reaches the host machine's Django server:
+
+```bash
+$ANDROID_HOME/platform-tools/adb reverse tcp:8000 tcp:8000
+```
+
+Confirm the emulator is visible first with:
+
+```bash
+$ANDROID_HOME/platform-tools/adb devices
+```
+
+For a physical device, replace the development base URL with the computer's reachable LAN IP address instead of using `adb reverse`.
+
+### 3. Build and run the Android app
 
 ```bash
 cd mobile
 ./gradlew :app:compileDebugKotlin
 ```
 
-## Submission Notes
+Run the `app` configuration from Android Studio on the connected emulator or device.
 
-The final PDF submission should include:
+### 4. Verify the core workflow
 
-- Brief app description
-- App prototype
-- Screenshots of the actual 50% Android interface/functionality
-- Complete source code organized by Kotlin file
-- Short purpose of each Kotlin file
-- Midterm learning reflection
+1. Register a new account or log in with an existing account.
+2. Create a note in the Knowledge Base.
+3. Add flashcards associated with that note.
+4. Open the related review session and complete its cards.
+5. Confirm XP, accuracy, streak, and mastery update on Dashboard, Profile, and Mastery.
+6. Log out, then log in again to confirm that the account's data remains scoped to that user.
 
-Suggested 50% functionality description:
+## Development Checks
 
-```text
-The Android version implements the main NSync interface using Jetpack Compose. It includes login/register UI, dashboard, knowledge base, review cards, review session, mastery tracking, profile, bottom navigation, and static sample data. Real authentication, persistent storage, Django API connection, OCR, and AI card generation are planned for future development.
+Run these checks before opening a pull request:
+
+```bash
+cd backend
+python manage.py test core
+
+cd ../mobile
+./gradlew :app:compileDebugKotlin
 ```
+
+## Security Notes
+
+- Keep `backend/.env` local. Commit only `.env.example` with placeholders.
+- JWT access and refresh tokens are stored locally by the Android client for session restoration.
+- Protected API routes require authentication and return only data owned by the current user.
