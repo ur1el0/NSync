@@ -19,7 +19,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +45,7 @@ import com.example.mobile.ui.theme.ScreenButtonStyle
 import com.example.mobile.ui.theme.ScreenCardBorder
 import com.example.mobile.ui.theme.ScreenSectionStyle
 import com.example.mobile.ui.theme.ScreenSmallBoldStyle
+import com.example.mobile.ui.theme.nsyncTextFieldColors
 
 import com.example.mobile.ui.viewmodel.NewNoteViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -217,11 +217,10 @@ fun NewNoteScreen(
                                     onValueChange = { content = it },
                                     modifier = Modifier.fillMaxSize(),
                                     textStyle = NewNoteFieldStyle,
-                                    colors = OutlinedTextFieldDefaults.colors(
+                                    colors = nsyncTextFieldColors(
                                         focusedBorderColor = Color.Transparent,
                                         unfocusedBorderColor = Color.Transparent,
-                                        focusedContainerColor = NSyncCardWhite,
-                                        unfocusedContainerColor = NSyncCardWhite
+                                        containerColor = NSyncCardWhite
                                     )
                                 )
                             }
@@ -316,12 +315,10 @@ private fun NewNoteField(
         singleLine = true,
         textStyle = NewNoteFieldStyle,
         shape = RoundedCornerShape(8.dp),
-        colors = OutlinedTextFieldDefaults.colors(
+        colors = nsyncTextFieldColors(
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color(0xFFF8F9FF),
-            unfocusedContainerColor = Color(0xFFF8F9FF),
-            cursorColor = NSyncBlue
+            containerColor = Color(0xFFF8F9FF)
         )
     )
 }
