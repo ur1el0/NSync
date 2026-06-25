@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,8 +18,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobile.ui.theme.InterFontFamily
-import com.example.mobile.ui.theme.NSyncBlue
-import com.example.mobile.ui.theme.NSyncCardWhite
+import com.example.mobile.ui.theme.nsyncTextFieldColors
 
 @Composable
 fun AuthTextField(
@@ -57,6 +55,7 @@ fun AuthTextField(
         singleLine = true,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         shape = RoundedCornerShape(10.dp),
+<<<<<<< Updated upstream
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = AuthInputText,
             unfocusedTextColor = AuthInputText,
@@ -72,6 +71,9 @@ fun AuthTextField(
             focusedLeadingIconColor = AuthIcon,
             unfocusedLeadingIconColor = AuthIcon
         )
+=======
+        colors = nsyncTextFieldColors(unfocusedBorderColor = AuthBorder)
+>>>>>>> Stashed changes
     )
 }
 

@@ -1,5 +1,8 @@
 package com.example.mobile.ui.theme
 
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -18,3 +21,35 @@ val NSyncCardWhite = Color(0xFFFFFFFF)
 val NSyncMutedText = Color(0xFF5F6675)
 val NSyncRed = Color(0xFFD21F2B)
 val NSyncBorder = Color(0xFFE1E5EF)
+val NSyncInputText = Color(0xFF151927)
+val NSyncPlaceholderText = Color(0xFF8D94A3)
+
+@Composable
+fun nsyncTextFieldColors(
+    focusedBorderColor: Color = NSyncBlue,
+    unfocusedBorderColor: Color = NSyncBorder,
+    containerColor: Color = NSyncCardWhite,
+): TextFieldColors = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = NSyncInputText,
+    unfocusedTextColor = NSyncInputText,
+    disabledTextColor = NSyncInputText.copy(alpha = 0.6f),
+    errorTextColor = NSyncInputText,
+    cursorColor = NSyncBlue,
+    errorCursorColor = NSyncRed,
+    focusedBorderColor = focusedBorderColor,
+    unfocusedBorderColor = unfocusedBorderColor,
+    disabledBorderColor = unfocusedBorderColor,
+    errorBorderColor = NSyncRed,
+    focusedContainerColor = containerColor,
+    unfocusedContainerColor = containerColor,
+    disabledContainerColor = containerColor,
+    errorContainerColor = containerColor,
+    focusedPlaceholderColor = NSyncPlaceholderText,
+    unfocusedPlaceholderColor = NSyncPlaceholderText,
+    disabledPlaceholderColor = NSyncPlaceholderText.copy(alpha = 0.6f),
+    focusedLabelColor = NSyncMutedText,
+    unfocusedLabelColor = NSyncMutedText,
+    disabledLabelColor = NSyncMutedText.copy(alpha = 0.6f),
+    focusedLeadingIconColor = NSyncMutedText,
+    unfocusedLeadingIconColor = NSyncMutedText,
+)

@@ -26,10 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile.ui.theme.NSyncBlue
-import com.example.mobile.ui.theme.NSyncLightBackground
 import com.example.mobile.ui.theme.ScreenBodyStyle
 import com.example.mobile.ui.theme.ScreenButtonStyle
 import com.example.mobile.ui.theme.ScreenHeroStyle
+import com.example.mobile.ui.theme.nsyncTextFieldColors
 import com.example.mobile.ui.viewmodel.NewFlashcardViewModel
 
 @Composable
@@ -81,7 +81,8 @@ fun NewFlashcardScreen(
             value = question,
             onValueChange = { question = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Question") }
+            label = { Text("Question") },
+            colors = nsyncTextFieldColors()
         )
         OutlinedTextField(
             value = answer,
@@ -89,13 +90,15 @@ fun NewFlashcardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(180.dp),
-            label = { Text("Answer") }
+            label = { Text("Answer") },
+            colors = nsyncTextFieldColors()
         )
         OutlinedTextField(
             value = difficulty,
             onValueChange = { difficulty = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Difficulty") }
+            label = { Text("Difficulty") },
+            colors = nsyncTextFieldColors()
         )
 
         viewModel.error?.let { message ->
