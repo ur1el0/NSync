@@ -58,15 +58,24 @@ fun AuthTextField(
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         shape = RoundedCornerShape(10.dp),
         colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = AuthInputText,
+            unfocusedTextColor = AuthInputText,
+            disabledTextColor = AuthInputText.copy(alpha = 0.6f),
             focusedBorderColor = NSyncBlue,
             unfocusedBorderColor = AuthBorder,
             focusedContainerColor = NSyncCardWhite,
             unfocusedContainerColor = NSyncCardWhite,
-            cursorColor = NSyncBlue
+            disabledContainerColor = NSyncCardWhite,
+            cursorColor = NSyncBlue,
+            focusedPlaceholderColor = AuthPlaceholder,
+            unfocusedPlaceholderColor = AuthPlaceholder,
+            focusedLeadingIconColor = AuthIcon,
+            unfocusedLeadingIconColor = AuthIcon
         )
     )
 }
 
+private val AuthInputText = Color(0xFF151927)
 private val AuthPlaceholder = Color(0xFFB5BBC6)
 private val AuthBorder = Color(0xFFE3E7F0)
 private val AuthIcon = Color(0xFF747B8A)
@@ -76,5 +85,6 @@ private val AuthFieldTextStyle = TextStyle(
     fontSize = 13.sp,
     lineHeight = 18.sp,
     fontWeight = FontWeight.Normal,
+    color = AuthInputText,
     letterSpacing = 0.sp
 )
