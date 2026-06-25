@@ -1,7 +1,6 @@
 package com.example.mobile.ui.screens.auth
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -116,13 +116,19 @@ fun RegisterScreen(
                     password.isNotBlank(),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp),
+                .height(56.dp)
+                .shadow(8.dp, RoundedCornerShape(999.dp)),
             shape = RoundedCornerShape(999.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = NSyncBlue)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = NSyncBlue,
+                contentColor = Color.White,
+                disabledContainerColor = NSyncBlue.copy(alpha = 0.45f),
+                disabledContentColor = Color.White
+            ),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
         ) {
             Text(
                 text = if (isLoading) "Creating account..." else "Create Account",
-                color = Color.White,
                 style = RegisterButtonStyle
             )
         }
