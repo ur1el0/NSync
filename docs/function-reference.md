@@ -42,16 +42,16 @@ All ViewModel files import `ViewModel`, `viewModelScope`, Compose state delegate
 | File | Classes and functions | Responsibility |
 | --- | --- | --- |
 | `ui/state/AuthUiState.kt` | `AuthUiState` | Auth loading, session, error, and restore-complete flags. |
-| `ui/state/DashboardUiState.kt` | `DashboardUiState` | Dashboard progress, recent knowledge, loading, and error. |
+| `ui/state/DashboardUiState.kt` | `DashboardUiState` | Dashboard display name/email, progress, recent knowledge, loading, and error. |
 | `ui/state/KnowledgeBaseUiState.kt` | `KnowledgeBaseUiState` | Note list, loading, and error. |
 | `ui/state/KnowledgeDetailUiState.kt` | `KnowledgeDetailUiState` | One note plus load/delete state. |
 | `ui/state/FlashcardDetailUiState.kt` | `FlashcardDetailUiState` | One card plus load/delete state. |
 | `ui/state/MasteryUiState.kt` | `MasteryUiState` | Progress and derived mastery list state. |
-| `ui/state/ProfileUiState.kt` | `ProfileUiState` | Profile progress, loading, and error. |
+| `ui/state/ProfileUiState.kt` | `ProfileUiState` | Profile display name/email, learning goal text, progress, loading, and error. |
 | `ui/state/SessionCompleteUiState.kt` | `SessionCompleteUiState` | Updated progress for completion screen. |
 | `ui/viewmodel/AuthViewModel.kt` | `AuthViewModel`; `login`; `register`; `logout`; `restoreSession`; `clearError` | Runs auth repository actions and updates `AuthUiState`. |
 | `ui/viewmodel/AuthViewModelFactory.kt` | `AuthViewModelFactory` | Supplies the repository constructor dependency to `AuthViewModel`. |
-| `ui/viewmodel/DashboardViewModel.kt` | `DashboardViewModel`; `loadDashboard` | Loads progress and recent notes for Dashboard. |
+| `ui/viewmodel/DashboardViewModel.kt` | `DashboardViewModel`; `loadDashboard` | Loads authenticated display name/email, progress, and recent notes for Dashboard. |
 | `ui/viewmodel/KnowledgeBaseViewModel.kt` | `KnowledgeBaseViewModel`; `loadNotes` | Loads the Knowledge Base list. |
 | `ui/viewmodel/KnowledgeDetailViewModel.kt` | `KnowledgeDetailViewModel`; `loadNote`; `deleteNote` | Loads or deletes one note. |
 | `ui/viewmodel/NewNoteViewModel.kt` | `NewNoteViewModel`; `createNote`; `loadNote`; `updateNote` | Creates a note or loads/updates it in edit mode. |
@@ -61,7 +61,7 @@ All ViewModel files import `ViewModel`, `viewModelScope`, Compose state delegate
 | `ui/viewmodel/ReviewSessionViewModel.kt` | `ReviewSessionResult`; `ReviewSessionViewModel`; `loadSession`; `nextCard`; `recordAnswer`; `consumeCompletedResult`; `completeSession` | Loads a note/card session, records recall choices, completes the backend review, and exposes navigation result values. |
 | `ui/viewmodel/SessionCompleteViewModel.kt` | `SessionCompleteViewModel`; `loadProgress` | Loads fresh progress for the completion screen. |
 | `ui/viewmodel/MasteryViewModel.kt` | `MasteryViewModel`; `loadMastery` | Loads progress/cards and derives collection mastery. |
-| `ui/viewmodel/ProfileViewModel.kt` | `ProfileViewModel`; `loadProfile` | Loads profile progress. |
+| `ui/viewmodel/ProfileViewModel.kt` | `ProfileViewModel`; `loadProfile` | Loads authenticated display name/email and profile progress. |
 
 ## Shared Compose Components
 
