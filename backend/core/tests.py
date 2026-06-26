@@ -121,3 +121,40 @@ class LearningDataOwnershipTests(APITestCase):
         self.assertEqual(user_b_progress.total_xp, 25)
         self.assertEqual(user_a_progress.streak, 1)
         self.assertEqual(user_b_progress.streak, 1)
+
+    @patch("core.api_views.timezone.localdate", return_value=date(2026, 6, 23))
+    def test_review_complete_accepts_card_answers(self, _mock_localdate):
+        first_card = Flashcard.objects.create(
+            connected_note=self.user_a_note,
+            question="Question 1",
+            answer="Answer 1",
+            mastery_level=0,
+        )
+        second_card = Flashcard.objects.create(
+            connected_note=self.user_a_note,
+            question="Question 2",
+            answer="Answer 2",
+            mastery_level=1,
+        )
+
+        self.client.force_authenticate(self.user_a)
+        response = self.client.post(
+            "/api/review/complete/",
+            {
+                "answers": [
+                    {"flashcard_id": first_card.id, "recalled": True},
+                    {"flashcard_id": second_card.id, "recalled": False},
+                ]
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["attempt"]["score"], 1)
+        self.assertEqual(response.data["attempt"]["total_questions"], 2)
+        self.assertEqual(response.data["attempt"]["xp_earned"], 50)
+
+        first_card.refresh_from_db()
+        second_card.refresh_from_db()
+        self.assertEqual(first_card.mastery_level, 1)
+        self.assertEqual(second_card.mastery_level, 0)

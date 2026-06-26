@@ -84,9 +84,41 @@ def progress_detail(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def complete_review(request):
-    score = int(request.data.get("score", 0))
-    total_questions = int(request.data.get("total_questions", 0))
-    xp_earned = int(request.data.get("xp_earned", 0))
+    answers = request.data.get("answers")
+
+    if isinstance(answers, list):
+        flashcard_ids = [answer.get("flashcard_id") for answer in answers]
+        owned_flashcards = Flashcard.objects.filter(
+            id__in=flashcard_ids,
+            connected_note__owner=request.user,
+        )
+        flashcards_by_id = {flashcard.id: flashcard for flashcard in owned_flashcards}
+
+        if len(flashcards_by_id) != len(set(flashcard_ids)):
+            return Response(
+                {"detail": "One or more flashcards do not belong to this user."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        score = 0
+        for answer in answers:
+            flashcard = flashcards_by_id.get(answer.get("flashcard_id"))
+            recalled = bool(answer.get("recalled", False))
+
+            if recalled:
+                score += 1
+                flashcard.mastery_level = min(3, flashcard.mastery_level + 1)
+            else:
+                flashcard.mastery_level = max(0, flashcard.mastery_level - 1)
+
+            flashcard.save(update_fields=["mastery_level"])
+
+        total_questions = len(answers)
+        xp_earned = total_questions * 25
+    else:
+        score = int(request.data.get("score", 0))
+        total_questions = int(request.data.get("total_questions", 0))
+        xp_earned = int(request.data.get("xp_earned", 0))
 
     attempt = QuizAttempt.objects.create(
         user=request.user,
