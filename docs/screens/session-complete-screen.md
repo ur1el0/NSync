@@ -1,11 +1,11 @@
 # Session Complete Screen
 
 **Source:** `mobile/app/src/main/java/com/example/mobile/ui/screens/review/SessionCompleteScreen.kt`
-**Route:** `Routes.SESSION_COMPLETE` with score, totalQuestions, and xpEarned
+**Route:** `Routes.SESSION_COMPLETE` with score, totalQuestions, xpEarned, and optional noteId scope
 
 ## Purpose and Data Flow
 
-The route carries the immediate session result. `SessionCompleteViewModel.loadProgress` then reloads persisted backend progress so the screen can display current streak, level, and accuracy rather than only local values.
+The route carries the immediate session result and the note ID when the user completed a note-scoped review. `SessionCompleteViewModel.loadProgress` then reloads persisted backend progress so the screen can display current streak, level, and accuracy rather than only local values.
 
 ## Functions
 
@@ -23,6 +23,6 @@ The route carries the immediate session result. `SessionCompleteViewModel.loadPr
 
 ## Navigation
 
-- Review Again opens a new `REVIEW_SESSION`.
+- Review Again opens the same note-scoped review session when a note ID is present; otherwise it opens the general `REVIEW_SESSION`.
 - Back to Dashboard clears/replaces the review path with `DASHBOARD`.
 - Bottom navigation is rendered in the screen scaffold.

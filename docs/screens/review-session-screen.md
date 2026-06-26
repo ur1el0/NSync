@@ -17,4 +17,4 @@
 
 ## Navigation
 
-The screen has no bottom navigation so the review stays focused. Completion opens `sessionComplete(score, totalQuestions, xpEarned)`.
+The screen has no bottom navigation so the review stays focused. Note-scoped sessions complete into `sessionComplete(score, totalQuestions, xpEarned, noteId)` so Review Again stays inside the same set.
