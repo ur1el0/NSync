@@ -87,7 +87,7 @@ fun DashboardScreen(
             }
 
             item {
-                DashboardGreeting("Roosc")
+                DashboardGreeting(uiState.displayName)
             }
 
             if (uiState.isLoading) {
