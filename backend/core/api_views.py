@@ -88,6 +88,13 @@ def complete_review(request):
 
     if isinstance(answers, list):
         flashcard_ids = [answer.get("flashcard_id") for answer in answers]
+
+        if len(flashcard_ids) != len(set(flashcard_ids)):
+            return Response(
+                {"detail": "Duplicate flashcard answers are not allowed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         owned_flashcards = Flashcard.objects.filter(
             id__in=flashcard_ids,
             connected_note__owner=request.user,
