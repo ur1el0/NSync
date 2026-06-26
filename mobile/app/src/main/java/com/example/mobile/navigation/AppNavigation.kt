@@ -238,7 +238,7 @@ fun AppNavigation() {
                 noteId = noteId,
                 onCompleteClick = { score, totalQuestions, xpEarned ->
                     navController.navigate(
-                        Routes.sessionComplete(score, totalQuestions, xpEarned)
+                        Routes.sessionComplete(score, totalQuestions, xpEarned, noteId)
                     )
                 }
             )
@@ -268,18 +268,27 @@ fun AppNavigation() {
             arguments = listOf(
                 navArgument("score") { type = NavType.IntType },
                 navArgument("totalQuestions") { type = NavType.IntType },
-                navArgument("xpEarned") { type = NavType.IntType }
+                navArgument("xpEarned") { type = NavType.IntType },
+                navArgument("noteId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val score = backStackEntry.arguments?.getInt("score") ?: return@composable
             val totalQuestions = backStackEntry.arguments?.getInt("totalQuestions") ?: return@composable
             val xpEarned = backStackEntry.arguments?.getInt("xpEarned") ?: return@composable
+            val completedNoteId = backStackEntry.arguments
+                ?.getInt("noteId")
+                ?.takeIf { it > 0 }
             SessionCompleteScreen(
                 score = score,
                 totalQuestions = totalQuestions,
                 xpEarned = xpEarned,
                 onRouteClick = navigateBottom,
-                onReviewAgainClick = { navController.navigate(Routes.REVIEW_SESSION) },
+                onReviewAgainClick = {
+                    navController.navigate(
+                        completedNoteId?.let { Routes.reviewSessionForNote(it) }
+                            ?: Routes.REVIEW_SESSION
+                    )
+                },
                 onDashboardClick = {
                     navController.navigate(Routes.DASHBOARD) {
                         popUpTo(Routes.DASHBOARD) {
