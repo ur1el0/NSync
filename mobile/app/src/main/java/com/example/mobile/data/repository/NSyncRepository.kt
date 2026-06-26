@@ -91,7 +91,7 @@ class NSyncRepository {
             context = tag.ifBlank { "Knowledge base" },
             summary = content,
             fullNote = content,
-            reviewCardCount = 0,
+            reviewCardCount = reviewCardCount,
             updatedLabel = "Updated recently",
             masteryPercent = 0,
             xpEarned = 0
