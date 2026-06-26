@@ -158,3 +158,24 @@ class LearningDataOwnershipTests(APITestCase):
         second_card.refresh_from_db()
         self.assertEqual(first_card.mastery_level, 1)
         self.assertEqual(second_card.mastery_level, 0)
+
+    def test_review_complete_rejects_duplicate_card_answers(self):
+        card = Flashcard.objects.create(
+            connected_note=self.user_a_note,
+            question="Question",
+            answer="Answer",
+        )
+
+        self.client.force_authenticate(self.user_a)
+        response = self.client.post(
+            "/api/review/complete/",
+            {
+                "answers": [
+                    {"flashcard_id": card.id, "recalled": True},
+                    {"flashcard_id": card.id, "recalled": False},
+                ]
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
