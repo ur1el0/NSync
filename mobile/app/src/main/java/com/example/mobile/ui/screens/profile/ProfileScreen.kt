@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -102,7 +103,9 @@ fun ProfileScreen(
                     border = ScreenCardBorder
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -115,14 +118,35 @@ fun ProfileScreen(
                         ) {
                             Text(uiState.displayName.take(1), color = NSyncBlue, style = ScreenHeroStyle)
                         }
-                        Text(uiState.displayName, color = Color(0xFF151927), style = ScreenSectionStyle)
-                        Text(uiState.email, color = NSyncMutedText, style = ScreenBodyStyle)
-                        Text(uiState.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
-                        Text("LVL ${progress?.level ?: 1}", color = NSyncBlue, style = ScreenSectionStyle)
+                        Text(
+                            uiState.displayName,
+                            color = Color(0xFF151927),
+                            style = ScreenSectionStyle,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            uiState.email,
+                            color = NSyncMutedText,
+                            style = ScreenBodyStyle,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            uiState.learningGoal,
+                            color = NSyncMutedText,
+                            style = ScreenBodyStyle,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            "LVL ${progress?.level ?: 1}",
+                            color = NSyncBlue,
+                            style = ScreenSectionStyle,
+                            textAlign = TextAlign.Center
+                        )
                         Text(
                             "$totalXp XP - $totalReviews cards reviewed",
                             color = NSyncMutedText,
-                            style = ScreenBodyStyle
+                            style = ScreenBodyStyle,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
