@@ -14,6 +14,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class NoteSerializer(serializers.ModelSerializer):
+    review_card_count = serializers.IntegerField(
+        source='flashcards.count',
+        read_only=True
+    )
+
     class Meta: 
         model = Note
         fields = [
@@ -21,6 +26,7 @@ class NoteSerializer(serializers.ModelSerializer):
             'title',
             'content',
             'tag',
+            'review_card_count',
             'created_at',
             'updated_at',
         ]
