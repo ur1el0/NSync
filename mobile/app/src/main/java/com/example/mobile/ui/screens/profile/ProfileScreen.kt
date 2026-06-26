@@ -32,7 +32,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile.R
-import com.example.mobile.data.SampleData
 import com.example.mobile.navigation.Routes
 import com.example.mobile.ui.components.MainScreenScaffold
 import com.example.mobile.ui.theme.ScreenBodyStyle
@@ -53,7 +52,6 @@ fun ProfileScreen(
     onLogoutClick: () -> Unit,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
-    val user = SampleData.userProfile
     val uiState = profileViewModel.uiState
     val progress = uiState.progress
     val totalXp = progress?.totalXp ?: 0
@@ -73,7 +71,7 @@ fun ProfileScreen(
     MainScreenScaffold(
         currentRoute = Routes.PROFILE,
         title = "User Profile",
-        subtitle = user.learningGoal,
+        subtitle = uiState.learningGoal,
         onRouteClick = onRouteClick
     ) {
         if (uiState.isLoading) {
@@ -115,11 +113,11 @@ fun ProfileScreen(
                                 .background(Color(0xFFE8F1FF)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(user.name.take(1), color = NSyncBlue, style = ScreenHeroStyle)
+                            Text(uiState.displayName.take(1), color = NSyncBlue, style = ScreenHeroStyle)
                         }
-                        Text(user.name, color = Color(0xFF151927), style = ScreenSectionStyle)
-                        Text(user.email, color = NSyncMutedText, style = ScreenBodyStyle)
-                        Text(user.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
+                        Text(uiState.displayName, color = Color(0xFF151927), style = ScreenSectionStyle)
+                        Text(uiState.email, color = NSyncMutedText, style = ScreenBodyStyle)
+                        Text(uiState.learningGoal, color = NSyncMutedText, style = ScreenBodyStyle)
                         Text("LVL ${progress?.level ?: 1}", color = NSyncBlue, style = ScreenSectionStyle)
                         Text(
                             "$totalXp XP - $totalReviews cards reviewed",

@@ -32,8 +32,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.mobile.R
+import com.example.mobile.data.remote.RetrofitClient
 import com.example.mobile.notifications.ReviewReminderScheduler
-import com.example.mobile.data.SampleData
 import com.example.mobile.ui.components.SettingsDivider
 import com.example.mobile.ui.components.SettingsDropdownRow
 import com.example.mobile.ui.components.SettingsRow
@@ -42,6 +42,7 @@ import com.example.mobile.ui.components.SettingsToggleRow
 import com.example.mobile.ui.theme.NSyncBlue
 import com.example.mobile.ui.theme.NSyncLightBackground
 import com.example.mobile.ui.theme.ScreenSectionStyle
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun SettingsScreen(
@@ -50,10 +51,10 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val preferences = remember(context) { SettingsPreferences.from(context) }
-    val user = SampleData.userProfile
     val goals = listOf(10, 20, 30, 50, 100)
     val reminderTimes = listOf("8:00 AM", "12:00 PM", "6:00 PM")
     val difficulties = listOf("Adaptive", "Easy", "Medium", "Hard")
+    var accountEmail by rememberSaveable { mutableStateOf("") }
 
     var dailyGoal by rememberSaveable {
         mutableIntStateOf(preferences.getInt(SettingsPreferences.DAILY_GOAL, 50))
@@ -76,6 +77,10 @@ fun SettingsScreen(
         notificationsEnabled = granted
         preferences.edit().putBoolean(SettingsPreferences.NOTIFICATIONS_ENABLED, granted).apply()
         if (granted) ReviewReminderScheduler.schedule(context) else ReviewReminderScheduler.cancel(context)
+    }
+
+    LaunchedEffect(Unit) {
+        accountEmail = RetrofitClient.sessionStore.sessionFlow.first()?.email.orEmpty()
     }
 
     LaunchedEffect(notificationsEnabled) {
@@ -108,7 +113,11 @@ fun SettingsScreen(
                 showChevron = true
             )
             SettingsDivider()
-            SettingsRow(label = "Email Address", value = user.email, iconRes = R.drawable.ic_mail_outline)
+            SettingsRow(
+                label = "Email Address",
+                value = accountEmail.ifBlank { "No email found" },
+                iconRes = R.drawable.ic_mail_outline
+            )
             SettingsDivider()
             SettingsRow(label = "Change Password", value = "Unavailable", iconRes = R.drawable.ic_lock_outline)
         }
