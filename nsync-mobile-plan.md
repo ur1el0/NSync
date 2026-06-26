@@ -24,7 +24,7 @@ Detailed commands are in [readme.md](readme.md).
 
 ## Next Priorities
 
-1. Replace remaining `SampleData` profile and presentation placeholders with authenticated API data.
+1. Replace remaining legacy presentation placeholders with authenticated API data where they still affect real screens.
 2. Add automated Android unit and UI tests for repositories, ViewModels, and navigation.
 3. Improve error messages and loading/retry states across all API-backed screens.
 4. Add backend support for password reset/change and connect it to Settings.
