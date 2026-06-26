@@ -7,6 +7,7 @@ data class NoteDto(
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
     @SerializedName("tag") val tag: String,
+    @SerializedName("review_card_count") val reviewCardCount: Int,
     @SerializedName("created_at") val created_at: String,
     @SerializedName("updated_at") val updated_at: String
 )
